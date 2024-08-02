@@ -8,6 +8,7 @@ const cors = require("cors");
 const app = express();
 app.use(express.json());
 
+// Configurações do banco de dados
 const sequelize = new Sequelize("db", "root", "root", {
   host: "localhost",
   dialect: "mysql",
@@ -20,16 +21,12 @@ const db = new LtiSequelize("db", "root", "root", {
   logging: false,
 });
 
+// Configuração do LTI
 lti.setup(
   "LTIKEY",
+  { plugin: db },
   {
-    plugin: db,
-  },
-  {
-    cookies: {
-      secure: false,
-      sameSite: "",
-    },
+    cookies: { secure: false, sameSite: "" },
     devMode: true,
   }
 );
@@ -41,150 +38,100 @@ lti.app.use(
   })
 );
 
-// Importa os modelos do Sequelize e passa a instância de conexão
-
+// Importação dos modelos do Sequelize
 const { Modulo, UsuarioModulo, Topico, UsuarioTopico, PlataformaRegistro, Aluno } = require("./models");
 
+// Handler de conexão LTI
 lti.onConnect(async (token, req, res) => {
-  const ltik = req.query.ltik;
-  let nomeModulo = token.platformContext.resource.title;
+  try {
+    const ltik = req.query.ltik;
+    let nomeModulo = token.platformContext.resource.title.toLowerCase().replace(/ /g, "-");
 
-  const responseDados = await lti.NamesAndRoles.getMembers(res.locals.token, {
-    resourceLinkId: true,
-  });
+    const modulo = await Modulo.findOne({ where: { nome_modulo: nomeModulo } });
 
-  let formatadoNomeModulo = nomeModulo.toLowerCase().replace(/ /g, "-");
-
-  const modulo = await Modulo.findOne({
-    where: { nome_modulo: formatadoNomeModulo },
-  });
-
-  if (modulo) {
-    const user = await Aluno.findOne({ where: { ltiUserId: token.user } });
-
-    if (user) {
-      console.log("LTIK do usuario atualizado com sucesso");
-      // Se o usuário existir, atualiza
-      await user.update({
-        ltik: ltik,
-      });
-
-      const userModulo = await UsuarioModulo.findOne({
-        where: { id_modulo: modulo.id, ltiUserId: user.ltiUserId },
-      });
-
-      // Desativa todos os módulos do usuário, exceto o módulo atual
-      await UsuarioModulo.update(
-        { ativo: false },
-        {
-          where: {
-            ltiUserId: user.ltiUserId,
-            id_modulo: { [Op.ne]: modulo.id },
-          },
-        }
-      );
-
-      if (userModulo) {
-        console.log("Já cadastrado");
-        // Se o usuário já estiver cadastrado neste módulo, ativa
-        await userModulo.update({ ativo: true });
-        const topicos = await Topico.findAll({
-          where: { id_modulo: modulo.id },
-        });
-
-        // Para cada tópico, verifica se o usuário já está cadastrado
-        for (let topico of topicos) {
-          const userTopico = await UsuarioTopico.findOne({
-            where: { ltiUserId: token.user, id_topico: topico.id },
-          });
-
-          // Se o usuário não estiver cadastrado neste tópico, cria uma nova entrada
-          if (!userTopico) {
-            await UsuarioTopico.create({
-              ltiUserId: token.user,
-              id_topico: topico.id,
-            });
-          }
-        }
+    if (modulo) {
+      const user = await Aluno.findOne({ where: { ltiUserId: token.user } });
+      if (user) {
+        await updateUser(user, ltik, modulo, token);
       } else {
-        console.log(modulo.id);
-        // Se o usuário não estiver cadastrado neste módulo, cria uma nova entrada e ativa
-        await UsuarioModulo.create({
-          id_modulo: modulo.id,
-          ltiUserId: token.user,
-        });
-
-        const topicos = await Topico.findAll({
-          where: { id_modulo: modulo.id },
-        });
-
-        // Para cada tópico, verifica se o usuário já está cadastrado
-        for (let topico of topicos) {
-          const userTopico = await UsuarioTopico.findOne({
-            where: { ltiUserId: token.user, id_topico: topico.id },
-          });
-
-          // Se o usuário não estiver cadastrado neste tópico, cria uma nova entrada
-          if (!userTopico) {
-            await UsuarioTopico.create({
-              ltiUserId: token.user,
-              id_topico: topico.id,
-            });
-          }
-        }
-        console.log("Não cadastrado neste modulo, mas o usuario já existe");
+        await createUser(token, ltik, modulo);
       }
+      res.redirect(`http://localhost:4200/modulo/${nomeModulo}?ltik=${ltik}`);
     } else {
-      await Aluno.create({
-        ltiUserId: token.user,
-        nome: token.userInfo.name,
-        email: token.userInfo.email,
-        ltik: ltik,
-      });
-
-      await UsuarioModulo.create({
-        id_modulo: modulo.id,
-        ltiUserId: token.user,
-      });
-
-      const topicos = await Topico.findAll({
-        where: { id_modulo: modulo.id },
-      });
-
-      console.log(topicos);
-
-      for (let topico of topicos) {
-        await UsuarioTopico.create({
-          ltiUserId: token.user,
-          id_topico: topico.id,
-        });
-      }
+      res.redirect("http://localhost:4200/error404");
+      console.log("Modulo não existe");
     }
-    console.log(formatadoNomeModulo);
-    res.redirect(
-      `http://localhost:4200/modulo/${formatadoNomeModulo}?ltik=${ltik}`
-    );
-  } else {
-    res.redirect(`http://localhost:4200/error404`);
-    console.log("Modulo não existe");
+  } catch (error) {
+    console.error("Erro na conexão LTI:", error);
+    res.status(500).send("Erro interno do servidor");
   }
 });
 
+// Função para criar novo usuário
+async function createUser(token, ltik, modulo) {
+  const user = await Aluno.create({
+    ltiUserId: token.user,
+    nome: token.userInfo.name,
+    email: token.userInfo.email,
+    ltik: ltik,
+  });
+
+  await UsuarioModulo.create({ id_modulo: modulo.id, ltiUserId: token.user });
+
+  const topicos = await Topico.findAll({ where: { id_modulo: modulo.id } });
+  for (let topico of topicos) {
+    await UsuarioTopico.create({ ltiUserId: token.user, id_topico: topico.id });
+  }
+}
+
+// Função para atualizar usuário existente
+async function updateUser(user, ltik, modulo, token) {
+  await user.update({ ltik: ltik });
+
+  await UsuarioModulo.update(
+    { ativo: false },
+    { where: { ltiUserId: user.ltiUserId, id_modulo: { [Op.ne]: modulo.id } } }
+  );
+
+  const userModulo = await UsuarioModulo.findOne({
+    where: { id_modulo: modulo.id, ltiUserId: user.ltiUserId },
+  });
+
+  if (userModulo) {
+    await userModulo.update({ ativo: true });
+  } else {
+    await UsuarioModulo.create({ id_modulo: modulo.id, ltiUserId: token.user });
+  }
+
+  const topicos = await Topico.findAll({ where: { id_modulo: modulo.id } });
+  for (let topico of topicos) {
+    const userTopico = await UsuarioTopico.findOne({
+      where: { ltiUserId: token.user, id_topico: topico.id },
+    });
+
+    if (!userTopico) {
+      await UsuarioTopico.create({ ltiUserId: token.user, id_topico: topico.id });
+    }
+  }
+}
+
+// Importação das rotas
 lti.app.use("/", require("./routes"));
 
+// Função para registrar plataformas
 const plataforma = async () => {
   try {
-    const plataforma = await PlataformaRegistro.findAll({
+    const plataformas = await PlataformaRegistro.findAll({
       attributes: ["plataformaNome", "plataformaUrl", "idCliente"],
     });
-    console.log(plataforma)
-    return plataforma;
+    return plataformas;
   } catch (error) {
     console.error("Erro ao buscar plataformas:", error);
     return [];
   }
 };
 
+// Configuração e inicialização do servidor
 const setup = async () => {
   try {
     await lti.deploy({ port: process.env.PORT || 3000 });
@@ -192,6 +139,7 @@ const setup = async () => {
     const registerPlataforma = await plataforma();
 
     for (let platform of registerPlataforma) {
+
       const { plataformaUrl, plataformaNome, idCliente } = platform.dataValues;
       if (plataformaUrl && plataformaNome && idCliente) {
         await lti.registerPlatform({

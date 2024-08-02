@@ -10,18 +10,21 @@ const {
   Referencias,
   Exercicios,
   Alternativas,
-  Aluno
+  Aluno,
 } = require("../models");
 const lti = require("ltijs").Provider;
 
-// Rota para enviar a nota de um aluno
+// Função para enviar a nota de um aluno
 router.post("/grade", async (req, res) => {
   try {
-    const idtoken = res.locals.token; // IdToken
-    const score = req.body.grade; // User numeric score sent in the body
+    const idtoken = res.locals.token;
+    const { grade: score } = req.body;
 
-    // Creating Grade object
-    let gradeObj = {
+    if (typeof score !== 'number' || score < 0 || score > 100) {
+      return res.status(400).json({ error: "Nota inválida" });
+    }
+
+    const gradeObj = {
       userId: idtoken.user,
       scoreGiven: score,
       scoreMaximum: 100,
@@ -29,41 +32,37 @@ router.post("/grade", async (req, res) => {
       gradingProgress: "FullyGraded",
     };
 
-    // Selecting lineItem ID
-    let lineItemId = idtoken.platformContext.endpoint.lineitem; // Attempting to retrieve it from idtoken
+    const lineItemId = idtoken.platformContext.endpoint.lineitem;
 
     const ltiUserId = res.locals.ltik;
     const user = await Aluno.findOne({ where: { ltik: ltiUserId } });
-    if (user) {
-      const userModulo = await UsuarioModulo.findOne({
-        where: { ltiUserId: user.ltiUserId, ativo: true },
-      });
-      if (userModulo) {
-        await userModulo.update({ nota: score });
-      } else {
-        console.log("Módulo ativo não encontrado");
-        return res.status(404).json({ error: "Módulo ativo não encontrado" });
-      }
-    } else {
+
+    if (!user) {
       console.log("Usuário não encontrado");
       return res.status(404).json({ error: "Usuário não encontrado" });
     }
 
-    // Sending Grade
-    const responseGrade = await lti.Grade.submitScore(
-      idtoken,
-      lineItemId,
-      gradeObj
-    );
+    const userModulo = await UsuarioModulo.findOne({
+      where: { ltiUserId: user.ltiUserId, ativo: true },
+    });
 
-    return res.send(responseGrade);
+    if (!userModulo) {
+      console.log("Módulo ativo não encontrado");
+      return res.status(404).json({ error: "Módulo ativo não encontrado" });
+    }
+
+    await userModulo.update({ nota: score });
+
+    const responseGrade = await lti.Grade.submitScore(idtoken, lineItemId, gradeObj);
+    return res.json(responseGrade);
+
   } catch (err) {
-    console.log(err.message);
-    return res.status(500).send({ error: err.message });
+    console.error("Erro ao enviar a nota:", err);
+    return res.status(500).json({ error: "Erro interno do servidor" });
   }
 });
 
-//Informações do usuario
+// Função para obter informações do usuário
 router.get("/userInfo", async (req, res) => {
   try {
     const ltik = res.locals.ltik;
@@ -81,9 +80,10 @@ router.get("/userInfo", async (req, res) => {
       return res.status(404).json({ error: "Módulo ativo não encontrado" });
     }
 
-    const modulo = await Modulo.findOne({
-      where: { id: userModulo.id_modulo },
-    });
+    const modulo = await Modulo.findOne({ where: { id: userModulo.id_modulo } });
+    if (!modulo) {
+      return res.status(404).json({ error: "Módulo não encontrado" });
+    }
 
     const topicos = await Topico.findAll({
       where: { id_modulo: modulo.id },
@@ -97,20 +97,14 @@ router.get("/userInfo", async (req, res) => {
         },
       ],
     });
-    const userTopico = await UsuarioTopico.findAll({
-      where: { ltiUserId: user.ltiUserId },
-    });
 
-    return res.json({
-      user,
-      modulo,
-      userModulo,
-      topicos,
-      userTopico,
-    });
+    const userTopico = await UsuarioTopico.findAll({ where: { ltiUserId: user.ltiUserId } });
+
+    return res.json({ user, modulo, userModulo, topicos, userTopico });
+
   } catch (err) {
-    console.log("Modulo não encontrado com sucesso");
-    return res.status(500).json({ error: err.message });
+    console.error("Erro ao obter informações do usuário:", err);
+    return res.status(500).json({ error: "Erro interno do servidor" });
   }
 });
 
