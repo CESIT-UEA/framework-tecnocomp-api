@@ -9,15 +9,17 @@ const app = express();
 app.use(express.json());
 
 // Configurações do banco de dados
-const sequelize = new Sequelize("db", "root", "root", {
-  host: "localhost",
-  dialect: "mysql",
+const sequelize = new Sequelize("tecnocomp", "tecnocomp", "0a463635baa5a", {
+  host: '172.25.1.5',
+  dialect: 'mysql', 
+  port:3306,
   logging: false,
 });
 
-const db = new LtiSequelize("db", "root", "root", {
-  host: "localhost",
-  dialect: "mysql",
+const db = new LtiSequelize("tecnocomp", "tecnocomp", "0a463635baa5a", {
+  host: '172.25.1.5',
+  dialect: 'mysql', 
+  port:3306,
   logging: false,
 });
 
