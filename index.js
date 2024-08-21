@@ -4,6 +4,7 @@ const { Sequelize, Op } = require("sequelize");
 const LtiSequelize = require("ltijs-sequelize");
 const lti = require("ltijs").Provider;
 const cors = require("cors");
+const fs = require('fs');
 
 const app = express();
 app.use(express.json());
@@ -29,7 +30,15 @@ lti.setup(
   { plugin: db },
   {
     cookies: { secure: false, sameSite: "" },
-    devMode: true,
+    devMode: false,
+  },
+  {https:true}
+  ,
+  {
+    ssl:{
+      key: fs.readFileSync('/certs/uea.edu.br.key'),
+      cert: fs.readFileSync('/certs/uea.edu.br.fullchain.crt')
+    }
   }
 );
 
@@ -42,6 +51,7 @@ lti.app.use(
 
 // Importação dos modelos do Sequelize
 const { Modulo, UsuarioModulo, Topico, UsuarioTopico, PlataformaRegistro, Aluno } = require("./models");
+const { options } = require("./routes");
 
 // Handler de conexão LTI
 lti.onConnect(async (token, req, res) => {
