@@ -136,7 +136,7 @@ const plataforma = async () => {
 // Configuração e inicialização do servidor
 const setup = async () => {
   try {
-    await lti.deploy({ port: process.env.PORT || 3000 });
+    await lti.deploy({ port: process.env.PORT});
 
     const registerPlataforma = await plataforma();
 
