@@ -33,13 +33,6 @@ lti.setup(
     devMode: false,
   },
   {https:true}
-  ,
-  {
-    ssl:{
-      key: fs.readFileSync('/certs/uea.edu.br.key'),
-      cert: fs.readFileSync('/certs/uea.edu.br.fullchain.crt')
-    }
-  }
 );
 
 lti.app.use(
@@ -49,6 +42,12 @@ lti.app.use(
   })
 );
 
+lti.app.use(
+  ssl({
+    key: fs.readFileSync('/certs/uea.edu.br.key'),
+    cert: fs.readFileSync('/certs/uea.edu.br.fullchain.crt')
+  })
+);
 // Importação dos modelos do Sequelize
 const { Modulo, UsuarioModulo, Topico, UsuarioTopico, PlataformaRegistro, Aluno } = require("./models");
 const { options } = require("./routes");
