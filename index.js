@@ -24,6 +24,11 @@ const db = new LtiSequelize("tecnocomp", "tecnocomp", "0a463635baa5a", {
   logging: false,
 });
 
+const sslOptions = {
+  key: fs.readFileSync('/certs/uea.edu.br.key'),
+  cert: fs.readFileSync('/certs/uea.edu.br.fullchain.crt')
+};
+
 // Configuração do LTI
 lti.setup(
   "LTIKEY",
@@ -31,8 +36,7 @@ lti.setup(
   {
     cookies: { secure: false, sameSite: "" },
     devMode: false,
-  },
-  {https:true}
+  }
 );
 
 lti.app.use(
@@ -42,12 +46,6 @@ lti.app.use(
   })
 );
 
-lti.app.use(
-  ssl({
-    key: fs.readFileSync('/certs/uea.edu.br.key'),
-    cert: fs.readFileSync('/certs/uea.edu.br.fullchain.crt')
-  })
-);
 // Importação dos modelos do Sequelize
 const { Modulo, UsuarioModulo, Topico, UsuarioTopico, PlataformaRegistro, Aluno } = require("./models");
 const { options } = require("./routes");
@@ -145,8 +143,6 @@ const plataforma = async () => {
 // Configuração e inicialização do servidor
 const setup = async () => {
   try {
-    await lti.deploy({port:8002});
-
     const registerPlataforma = await plataforma();
 
     for (let platform of registerPlataforma) {
@@ -174,4 +170,12 @@ const setup = async () => {
   }
 };
 
-setup();
+lti.deploy({ app });
+
+// Cria o servidor HTTPS
+const httpsServer = https.createServer(sslOptions, app);
+
+// Inicia o servidor na porta 8002
+httpsServer.listen(8002, () => {
+    console.log('Servidor HTTPS rodando em https://cesitserver.uea.edu.br:8002');
+});
