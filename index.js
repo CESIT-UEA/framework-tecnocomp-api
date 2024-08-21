@@ -152,7 +152,7 @@ const plataforma = async () => {
 // Configuração e inicialização do servidor
 const setup = async () => {
   try {
-    await lti.deploy({port: 8002})
+    await lti.deploy({serverless:true})
     const registerPlataforma = await plataforma();
 
     for (let platform of registerPlataforma) {
