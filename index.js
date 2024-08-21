@@ -1,11 +1,11 @@
 const express = require("express");
+const fs = require('fs');
+const https = require('https');
 const path = require("path");
 const { Sequelize, Op } = require("sequelize");
 const LtiSequelize = require("ltijs-sequelize");
 const lti = require("ltijs").Provider;
 const cors = require("cors");
-const fs = require('fs');
-const https = require('https');
 
 const app = express();
 app.use(express.json());
@@ -14,17 +14,18 @@ app.use(express.json());
 const sequelize = new Sequelize("tecnocomp", "tecnocomp", "0a463635baa5a", {
   host: '172.25.1.5',
   dialect: 'mysql', 
-  port:3306,
+  port: 3306,
   logging: false,
 });
 
 const db = new LtiSequelize("tecnocomp", "tecnocomp", "0a463635baa5a", {
   host: '172.25.1.5',
   dialect: 'mysql', 
-  port:3306,
+  port: 3306,
   logging: false,
 });
 
+// Configurações do SSL
 const sslOptions = {
   key: fs.readFileSync('/certs/uea.edu.br.key'),
   cert: fs.readFileSync('/certs/uea.edu.br.fullchain.crt')
@@ -32,22 +33,15 @@ const sslOptions = {
 
 // Configuração do LTI
 lti.setup(
-  "LTIKEY",
-  { plugin: db },
+  "LTIKEY", // Chave de LTI, use uma string forte
+  { plugin: db }, // Plugin do Sequelize configurado anteriormente
   {
     cookies: { secure: true, sameSite: "None" },
-    devMode: false,
-  },
-  {https:true},
-  {
-    ssl:
-     {
-    key:sslOptions.key,
-    cert: sslOptions.cert
+    devMode: false, // Certifique-se de que o devMode está desabilitado para usar SSL
   }
-}
 );
 
+// CORS para permitir requisições do frontend
 lti.app.use(
   cors({
     origin: "http://localhost:4200",
@@ -149,14 +143,20 @@ const plataforma = async () => {
   }
 };
 
-// Configuração e inicialização do servidor
+// Criação do servidor HTTPS usando as opções SSL configuradas
+https.createServer(sslOptions, lti.app).listen(8002, () => {
+  console.log('Servidor HTTPS rodando na porta 8002');
+});
+
+// Função de setup
 const setup = async () => {
   try {
-    await lti.deploy({port:8002})
+    await lti.deploy(); // O deploy é necessário para inicializar o LTI, mas a porta será gerida pelo HTTPS criado manualmente
+
+    // Registro das plataformas
     const registerPlataforma = await plataforma();
 
     for (let platform of registerPlataforma) {
-
       const { plataformaUrl, plataformaNome, idCliente } = platform.dataValues;
       if (plataformaUrl && plataformaNome && idCliente) {
         await lti.registerPlatform({
@@ -180,4 +180,5 @@ const setup = async () => {
   }
 };
 
-setup()
+// Chamada da função de setup
+setup();
