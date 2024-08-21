@@ -35,7 +35,7 @@ lti.setup(
   "LTIKEY",
   { plugin: db },
   {
-    cookies: { secure: false, sameSite: "" },
+    cookies: { secure: true, sameSite: "None" },
     devMode: false,
   },
   {https:true},
@@ -152,7 +152,7 @@ const plataforma = async () => {
 // Configuração e inicialização do servidor
 const setup = async () => {
   try {
-    await lti.deploy({serverless:true})
+    await lti.deploy({port:8002})
     const registerPlataforma = await plataforma();
 
     for (let platform of registerPlataforma) {
