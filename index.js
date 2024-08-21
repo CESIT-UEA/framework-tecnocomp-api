@@ -37,7 +37,15 @@ lti.setup(
   {
     cookies: { secure: false, sameSite: "" },
     devMode: false,
+  },
+  {https:true},
+  {
+    ssl:
+     {
+    key:sslOptions.key,
+    cert: sslOptions.cert
   }
+}
 );
 
 lti.app.use(
@@ -144,6 +152,7 @@ const plataforma = async () => {
 // Configuração e inicialização do servidor
 const setup = async () => {
   try {
+    await lti.deploy({port: 8002})
     const registerPlataforma = await plataforma();
 
     for (let platform of registerPlataforma) {
@@ -171,12 +180,4 @@ const setup = async () => {
   }
 };
 
-lti.deploy({ app });
-
-// Cria o servidor HTTPS
-const httpsServer = https.createServer(sslOptions, app);
-
-// Inicia o servidor na porta 8002
-httpsServer.listen(8002, () => {
-    console.log('Servidor HTTPS rodando em https://cesitserver.uea.edu.br:8002');
-});
+setup()
