@@ -38,7 +38,7 @@ lti.setup(
   {
     cookies: { secure: true, sameSite: "None" ,domain: '.uea.edu.br'},
     devMode: false, // Certifique-se de que o devMode está desabilitado para usar SSL
-  },
+  }
   
 );
 urlFront = "https://frametecnocomp.uea.edu.br"
@@ -46,7 +46,7 @@ urlFront = "https://frametecnocomp.uea.edu.br"
 lti.app.use(
   cors({
     origin: urlFront,
-    credentials: true,
+    credentials: 'include',
   })
 );
 
@@ -71,7 +71,7 @@ lti.onConnect(async (token, req, res) => {
       }
       console.log("Passei por aqui")
       console.log(`${urlFront}/modulo/${nomeModulo}?ltik=${ltik}`)
-      lti.redirect(res,`${urlFront}/modulo/${nomeModulo}?ltik=${ltik}`);
+      res.redirect(`${urlFront}/modulo/${nomeModulo}?ltik=${ltik}`);
     } else {
       res.redirect(`${urlFront}/error404`);
       console.log("Modulo não existe");
@@ -132,7 +132,6 @@ async function updateUser(user, ltik, modulo, token) {
 
 // Importação das rotas
 lti.app.use("/", require("./routes"));
-lti.whitelist('/')
 // Função para registrar plataformas
 const plataforma = async () => {
   try {
