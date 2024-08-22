@@ -173,12 +173,10 @@ router.get("/userInfo", async (req, res) => {
       include: [
         {
           model: UsuarioTopico,
-          as: 'usuarioTopico', // Alias definido na associação
           required: true, // Equivalente a um INNER JOIN
           include: [
             {
               model: Aluno,
-              as: 'aluno', // Alias definido na associação
               required: true, // Equivalente a um INNER JOIN
               where: {
                 ltiUserId: user.ltiUserId
