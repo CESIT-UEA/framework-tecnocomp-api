@@ -40,11 +40,11 @@ lti.setup(
     devMode: false, // Certifique-se de que o devMode está desabilitado para usar SSL
   }
 );
-
+urlFront = "http://localhost:4200/"
 // CORS para permitir requisições do frontend
 lti.app.use(
   cors({
-    origin: "https://frametecnocomp.uea.edu.br",
+    origin: urlFront,
     credentials: true,
   })
 );
@@ -69,10 +69,10 @@ lti.onConnect(async (token, req, res) => {
         await createUser(token, ltik, modulo);
       }
       console.log("Passei por aqui")
-      console.log(`https://frametecnocomp.uea.edu.br/modulo/${nomeModulo}?ltik=${ltik}`)
-      res.redirect(`https://frametecnocomp.uea.edu.br/modulo/${nomeModulo}?ltik=${ltik}`);
+      console.log(`${urlFront}/modulo/${nomeModulo}?ltik=${ltik}`)
+      res.redirect(`${urlFront}/modulo/${nomeModulo}?ltik=${ltik}`);
     } else {
-      res.redirect("https://frametecnocomp.uea.edu.br/error404");
+      res.redirect(`${urlFront}/error404`);
       console.log("Modulo não existe");
     }
   } catch (error) {
