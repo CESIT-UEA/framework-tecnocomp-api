@@ -36,7 +36,7 @@ lti.setup(
   "LTIKEY", // Chave de LTI, use uma string forte
   { plugin: db }, // Plugin do Sequelize configurado anteriormente
   {
-    cookies: { secure: true, sameSite: "None" ,domain: '.uea.edu.br'},
+    cookies: { secure: true, sameSite: "None"},
     devMode: false, // Certifique-se de que o devMode está desabilitado para usar SSL
   }
   
