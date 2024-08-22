@@ -47,4 +47,7 @@ db.UsuarioModulo.belongsTo(db.Aluno, { foreignKey: 'ltiUserId' });
 db.Aluno.hasMany(db.UsuarioTopico, { foreignKey: 'ltiUserId' });
 db.UsuarioTopico.belongsTo(db.Aluno, { foreignKey: 'ltiUserId' });
 
+db.Topico.hasMany(db.UsuarioTopico, { foreignKey: 'id_topico' });
+db.UsuarioTopico.belongsTo(db.Topico, { foreignKey: 'id_topico' });
+
 module.exports = db;
