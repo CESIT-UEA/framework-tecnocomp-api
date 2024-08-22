@@ -169,7 +169,28 @@ router.get("/userInfo", async (req, res) => {
       ],
     });
 
-    const userTopico = await UsuarioTopico.findAll({ where: { ltiUserId: user.ltiUserId } });
+    const resultado = await Topico.findAll({
+      include: [
+        {
+          model: UsuarioTopico,
+          as: 'usuarioTopico', // Alias definido na associação
+          required: true, // Equivalente a um INNER JOIN
+          include: [
+            {
+              model: Aluno,
+              as: 'aluno', // Alias definido na associação
+              required: true, // Equivalente a um INNER JOIN
+              where: {
+                ltiUserId: user.ltiUserId
+              }
+            }
+          ]
+        }
+      ],
+      where: {
+        id_modulo: modulo.id
+      }
+    });
 
     return res.json({ user, modulo, userModulo, topicos, userTopico });
 
