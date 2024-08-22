@@ -36,8 +36,8 @@ lti.setup(
   "LTIKEY", // Chave de LTI, use uma string forte
   { plugin: db }, // Plugin do Sequelize configurado anteriormente
   {
-    cookies: { secure: true, sameSite: "None" ,domain: 'frametecnocomp.uea.edu.br'},
-    devMode: true, // Certifique-se de que o devMode está desabilitado para usar SSL
+    cookies: { secure: true, sameSite: "None" ,domain: '.uea.edu.br'},
+    devMode: false, // Certifique-se de que o devMode está desabilitado para usar SSL
   },
   
 );
@@ -71,7 +71,7 @@ lti.onConnect(async (token, req, res) => {
       }
       console.log("Passei por aqui")
       console.log(`${urlFront}/modulo/${nomeModulo}?ltik=${ltik}`)
-      res.redirect(`${urlFront}/modulo/${nomeModulo}?ltik=${ltik}`);
+      lti.redirect(res,`${urlFront}/modulo/${nomeModulo}?ltik=${ltik}`);
     } else {
       res.redirect(`${urlFront}/error404`);
       console.log("Modulo não existe");
