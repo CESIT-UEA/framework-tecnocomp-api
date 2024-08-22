@@ -68,9 +68,10 @@ lti.onConnect(async (token, req, res) => {
       } else {
         await createUser(token, ltik, modulo);
       }
-      res.redirect(`http://localhost:4200/modulo/${nomeModulo}?ltik=${ltik}`);
+      console.log("Passei por aqui")
+      res.redirect(`https://frametecnocomp.uea.edu.br/modulo/${nomeModulo}?ltik=${ltik}`);
     } else {
-      res.redirect("http://localhost:4200/error404");
+      res.redirect("https://frametecnocomp.uea.edu.br/error404");
       console.log("Modulo não existe");
     }
   } catch (error) {
