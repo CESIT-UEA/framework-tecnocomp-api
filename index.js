@@ -36,11 +36,10 @@ lti.setup(
   "LTIKEY", // Chave de LTI, use uma string forte
   { plugin: db }, // Plugin do Sequelize configurado anteriormente
   {
-    devMode: false, // Certifique-se de que o devMode está desabilitado para usar SSL
+    cookies: { secure: true, sameSite: "None" ,domain: 'frametecnocomp.uea.edu.br'},
+    devMode: true, // Certifique-se de que o devMode está desabilitado para usar SSL
   },
-  { 
-    ltiaas: true // Using ltiaas mode
-  }
+  
 );
 urlFront = "https://frametecnocomp.uea.edu.br"
 // CORS para permitir requisições do frontend
