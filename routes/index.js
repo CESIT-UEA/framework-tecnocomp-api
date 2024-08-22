@@ -102,7 +102,10 @@ router.post("/gradeIn", async (req, res) => {
     }
 
     await userModulo.update({ nota: score });
-
+    console.log("Token")
+    console.log(idtoken)
+    console.log("Line item id")
+    console.log(lineItemId)
     const responseGrade = await lti.Grade.submitScore(idtoken, lineItemId, gradeObj);
     return res.json(responseGrade);
 
