@@ -132,7 +132,7 @@ async function updateUser(user, ltik, modulo, token) {
 
 // Importação das rotas
 lti.app.use("/", require("./routes"));
-
+lti.whitelist('/')
 // Função para registrar plataformas
 const plataforma = async () => {
   try {
