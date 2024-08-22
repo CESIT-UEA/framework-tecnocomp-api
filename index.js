@@ -44,7 +44,7 @@ lti.setup(
 // CORS para permitir requisições do frontend
 lti.app.use(
   cors({
-    origin: "http://localhost:4200",
+    origin: "https://frametecnocomp.uea.edu.br",
     credentials: true,
   })
 );
@@ -69,6 +69,7 @@ lti.onConnect(async (token, req, res) => {
         await createUser(token, ltik, modulo);
       }
       console.log("Passei por aqui")
+      console.log(`https://frametecnocomp.uea.edu.br/modulo/${nomeModulo}?ltik=${ltik}`)
       res.redirect(`https://frametecnocomp.uea.edu.br/modulo/${nomeModulo}?ltik=${ltik}`);
     } else {
       res.redirect("https://frametecnocomp.uea.edu.br/error404");
