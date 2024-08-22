@@ -169,7 +169,7 @@ router.get("/userInfo", async (req, res) => {
       ],
     });
 
-    const resultado = await Topico.findAll({
+    const userTopico = await Topico.findAll({
       include: [
         {
           model: UsuarioTopico,
