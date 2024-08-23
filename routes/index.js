@@ -70,8 +70,10 @@ router.post("/gradeIn", async (req, res) => {
     const idtoken = res.locals.token;
     const { grade: score } = req.body;
 
-    if (typeof score !== 'number' || score < 0 || score > 100) {
+    if (typeof score !== 'number' || score < 0) {
       return res.status(400).json({ error: "Nota inválida" });
+    }else if(score >= 100){
+      score = 100
     }
 
     const gradeObj = {
