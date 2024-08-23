@@ -94,6 +94,8 @@ router.post("/gradeIn", async (req, res) => {
       }
 
      )
+     console.log(req.body)
+     console.log(res.locals)
      console.log(lineItemId)
      console.log(idtoken)
      console.log(gradeObj)
