@@ -66,62 +66,7 @@ router.post("/grade", async (req, res) => {
 
 router.post("/gradeIn", async (req, res) => {
   console.log("Entrei em Gradein Adulterado")
-  try {
-    const idtoken = res.locals.token // IdToken
-    const score = req.body.grade // User numeric score sent in the body
-    // Creating Grade object
-    const gradeObj = {
-      userId: idtoken.user,
-      scoreGiven: score,
-      scoreMaximum: 100,
-      activityProgress: 'Completed',
-      gradingProgress: 'FullyGraded'
-    }
-
-    // Selecting linetItem ID
-    let lineItemId = idtoken.platformContext.endpoint.lineitem // Attempting to retrieve it from idtoken
-    if (!lineItemId) {
-      const response = await lti.Grade.getLineItems(idtoken, { resourceLinkId: true })
-      const lineItems = response.lineItems
-      if (lineItems.length === 0) {
-        // Creating line item if there is none
-        console.log('Creating new line item')
-        const newLineItem = {
-          scoreMaximum: 100,
-          label: 'Grade',
-          tag: 'grade',
-          resourceLinkId: idtoken.platformContext.resource.id
-        }
-        const lineItem = await lti.Grade.createLineItem(idtoken, newLineItem)
-        lineItemId = lineItem.id
-      } else lineItemId = lineItems[0].id
-    }
-    console.log("Estou aqui")
-    // Sending Grade
-    lti.Grade.scorePublish(res.locals.token, gradeObj)
-    .then(
-      sucesso => {
-        console.log("Deu certo: ",sucesso)
-      },
-      erro => {
-        console.log("Erro: ", erro)
-      }
-
-     )
-    lti.Grade.submitScore(idtoken, lineItemId, gradeObj).then(
-      sucesso => {
-        console.log("Deu certo: ",sucesso)
-      },
-      erro => {
-        console.log("Erro: ", erro)
-      }
-    )
-
-    return res.send("Help me")
-  } catch (err) {
-    return res.status(500).send({ err: err.message })
-  }
-/*   try {
+  try { 
     const idtoken = res.locals.token;
     let { grade: score } = req.body;
     
@@ -167,7 +112,7 @@ router.post("/gradeIn", async (req, res) => {
   } catch (err) {
     console.error("Erro ao enviar a nota:", err);
     return res.status(500).json(err);
-  } */
+  } 
 });
 
 router.post("/api/liberar", async (req,res) =>{
