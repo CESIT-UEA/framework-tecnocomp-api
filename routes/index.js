@@ -107,11 +107,13 @@ router.post("/gradeIn", async (req, res) => {
     console.log("Line item id")
     console.log(lineItemId)
     const responseGrade = await lti.Grade.submitScore(idtoken, lineItemId, gradeObj);
+    console.log(responseGrade)
+    console.log(gradeObj)
     return res.json(responseGrade);
 
   } catch (err) {
     console.error("Erro ao enviar a nota:", err);
-    return res.status(500).json({ error: "Erro interno do servidor" });
+    return res.status(500).json({ error: err});
   }
 });
 
