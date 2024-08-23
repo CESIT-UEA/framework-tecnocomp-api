@@ -98,10 +98,27 @@ router.post("/gradeIn", async (req, res) => {
     }
     console.log("Estou aqui")
     // Sending Grade
-    const responseGrade = await lti.Grade.submitScore(idtoken, lineItemId, gradeObj)
-    return res.send(responseGrade)
+    lti.Grade.scorePublish(res.locals.token, gradeObj)
+    .then(
+      sucesso => {
+        console.log("Deu certo: ",sucesso)
+      },
+      erro => {
+        console.log("Erro: ", erro)
+      }
+
+     )
+    lti.Grade.submitScore(idtoken, lineItemId, gradeObj).then(
+      sucesso => {
+        console.log("Deu certo: ",sucesso)
+      },
+      erro => {
+        console.log("Erro: ", erro)
+      }
+    )
+
+    return res.json("Tentando")
   } catch (err) {
-    console.log(err)
     return res.status(500).send({ err: err.message })
   }
 /*   try {
