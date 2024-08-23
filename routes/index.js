@@ -68,7 +68,7 @@ router.post("/gradeIn", async (req, res) => {
   console.log("Entrei em Gradein")
   try {
     const idtoken = res.locals.token;
-    const { grade: score } = req.body;
+    let { grade: score } = req.body;
 
     if (typeof score !== 'number' || score < 0) {
       return res.status(400).json({ error: "Nota inválida" });
@@ -76,7 +76,7 @@ router.post("/gradeIn", async (req, res) => {
 
     const gradeObj = {
       userId: idtoken.user,
-      scoreGiven: score,
+      scoreGiven: 50,
       scoreMaximum: 100,
       activityProgress: "InProgress",
       gradingProgress: "FullyGraded",
