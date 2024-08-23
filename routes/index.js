@@ -56,7 +56,7 @@ router.post("/grade", async (req, res) => {
     await userModulo.update({ nota: score });
 
     const responseGrade = await lti.Grade.submitScore(idtoken, lineItemId, gradeObj);
-    return res.json(responseGrade);
+    return res.send(responseGrade);
 
   } catch (err) {
     console.error("Erro ao enviar a nota:", err);
@@ -108,10 +108,10 @@ router.post("/gradeIn", async (req, res) => {
     console.log(lineItemId)
     console.log(gradeObj)
     const responseGrade = await lti.Grade.submitScore(idtoken, lineItemId, gradeObj);
-    return res.json(responseGrade);
+    return res.send(responseGrade);
   } catch (err) {
     console.error("Erro ao enviar a nota:", err);
-    return res.status(500).json({ error: err.message});
+    return res.status(500).json(err);
   }
 });
 
