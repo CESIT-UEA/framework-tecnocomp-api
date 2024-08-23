@@ -80,40 +80,30 @@ router.post("/gradeIn", async (req, res) => {
 
     // Selecting linetItem ID
     let lineItemId = idtoken.platformContext.endpoint.lineitem // Attempting to retrieve it from idtoken
-    if (!lineItemId) {
-      const response = await lti.Grade.getLineItems(idtoken, { resourceLinkId: true })
-      const lineItems = response.lineItems
-      if (lineItems.length === 0) {
-        // Creating line item if there is none
-        console.log('Creating new line item')
-        const newLineItem = {
-          scoreMaximum: 100,
-          label: 'Grade',
-          tag: 'grade',
-          resourceLinkId: idtoken.platformContext.resource.id
-        }
-        const lineItem = await lti.Grade.createLineItem(idtoken, newLineItem)
-        lineItemId = lineItem.id
-      } else lineItemId = lineItems[0].id
-    }
+
     console.log("Estou aqui")
     // Sending Grade
-    lti.Grade.scorePublish(res.locals.token, gradeObj)
+    lti.Grade.scorePublish(idtoken, gradeObj)
     .then(
       sucesso => {
-        console.log("Deu certo: ",sucesso)
+        console.log("Deu certo pu: ",sucesso)
       },
       erro => {
-        console.log("Erro: ", erro)
+        console.log(erro)
+        console.log("Erro pu: ", erro.message)
       }
 
      )
+     console.log(lineItemId)
+     console.log(idtoken)
+     console.log(gradeObj)
     lti.Grade.submitScore(idtoken, lineItemId, gradeObj).then(
       sucesso => {
-        console.log("Deu certo: ",sucesso)
+        console.log("Deu certo score: ",sucesso)
       },
       erro => {
-        console.log("Erro: ", erro)
+        console.log(erro)
+        console.log("Erro score: ", erro.message)
       }
     )
 
