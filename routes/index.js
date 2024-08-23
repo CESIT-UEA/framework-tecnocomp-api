@@ -69,14 +69,14 @@ router.post("/gradeIn", async (req, res) => {
   try {
     const idtoken = res.locals.token;
     let { grade: score } = req.body;
-
+    
     if (typeof score !== 'number' || score < 0) {
       return res.status(400).json({ error: "Nota inválida" });
     }
 
     const gradeObj = {
       userId: idtoken.user,
-      scoreGiven: 50,
+      scoreGiven: score,
       scoreMaximum: 100,
       activityProgress: "InProgress",
       gradingProgress: "FullyGraded",
@@ -106,11 +106,9 @@ router.post("/gradeIn", async (req, res) => {
     console.log(idtoken)
     console.log("Line item id")
     console.log(lineItemId)
-    const responseGrade = await lti.Grade.submitScore(idtoken, lineItemId, gradeObj);
-    console.log(responseGrade)
     console.log(gradeObj)
+    const responseGrade = await lti.Grade.submitScore(idtoken, lineItemId, gradeObj);
     return res.json(responseGrade);
-
   } catch (err) {
     console.error("Erro ao enviar a nota:", err);
     return res.status(500).json({ error: err.message});
