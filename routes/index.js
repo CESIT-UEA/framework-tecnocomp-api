@@ -72,8 +72,6 @@ router.post("/gradeIn", async (req, res) => {
 
     if (typeof score !== 'number' || score < 0) {
       return res.status(400).json({ error: "Nota inválida" });
-    }else if(score >= 100){
-      score = 100
     }
 
     const gradeObj = {
@@ -115,7 +113,7 @@ router.post("/gradeIn", async (req, res) => {
 
   } catch (err) {
     console.error("Erro ao enviar a nota:", err);
-    return res.status(500).json({ error: err});
+    return res.status(500).json({ error: err.message});
   }
 });
 
