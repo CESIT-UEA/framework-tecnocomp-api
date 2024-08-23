@@ -83,7 +83,7 @@ router.post("/gradeIn", async (req, res) => {
 
     console.log("Estou aqui")
     // Sending Grade
-    lti.Grade.scorePublish(idtoken, gradeObj)
+    await lti.Grade.scorePublish(idtoken, gradeObj)
     .then(
       sucesso => {
         console.log("Deu certo pu: ",sucesso)
@@ -99,7 +99,7 @@ router.post("/gradeIn", async (req, res) => {
      console.log(lineItemId)
      console.log(idtoken)
      console.log(gradeObj)
-    lti.Grade.submitScore(idtoken, lineItemId, gradeObj).then(
+    await lti.Grade.submitScore(idtoken, lineItemId, gradeObj).then(
       sucesso => {
         console.log("Deu certo score: ",sucesso)
       },
