@@ -74,6 +74,7 @@ lti.onConnect(async (token, req, res) => {
 
       if(token.platformContext.launchPresentation.document_target == 'frame'){
         console.log("Indo pro app")
+        res.redirect(`http://localhost:8100/app-mob`);
       }else{
         console.log("Indo pra web")
       }
