@@ -56,6 +56,8 @@ const { options } = require("./routes");
 // Handler de conexão LTI
 lti.onConnect(async (token, req, res) => {
   try {
+    console.log("Token abaixo")
+    console.log(token)
     const ltik = req.query.ltik;
     let nomeModulo = token.platformContext.resource.title.toLowerCase().replace(/ /g, "-");
 
