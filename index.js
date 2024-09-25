@@ -36,10 +36,9 @@ lti.setup(
   "LTIKEY", // Chave de LTI, use uma string forte
   { plugin: db }, // Plugin do Sequelize configurado anteriormente
   {
-    cookies: { secure: true, sameSite: "None"},
+    cookies: { secure: false, sameSite: ''},
     devMode: true, // Certifique-se de que o devMode está desabilitado para usar SSL
   }
-  
 );
 urlFront = "https://frametecnocomp.uea.edu.br"
 // CORS para permitir requisições do frontend
@@ -153,7 +152,7 @@ https.createServer(sslOptions, lti.app).listen(8002, () => {
 // Função de setup
 const setup = async () => {
   try {
-    await lti.deploy(); // O deploy é necessário para inicializar o LTI, mas a porta será gerida pelo HTTPS criado manualmente
+    await lti.deploy({port:3000}); // O deploy é necessário para inicializar o LTI, mas a porta será gerida pelo HTTPS criado manualmente
 
     // Registro das plataformas
     const registerPlataforma = await plataforma();

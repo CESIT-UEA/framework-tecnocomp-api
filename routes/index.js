@@ -92,7 +92,25 @@ router.post("/gradeIn", async (req, res) => {
     if (!lineItemId) {
       return res.status(400).send({ error: "LineItem ID não encontrado" });
     }
+    
+    const ltiUserId = res.locals.ltik;
+    const user = await Aluno.findOne({ where: { ltik: ltiUserId } });
 
+    if (!user) {
+      console.log("Usuário não encontrado");
+      return res.status(404).json({ error: "Usuário não encontrado" });
+    }
+
+    const userModulo = await UsuarioModulo.findOne({
+      where: { ltiUserId: user.ltiUserId, ativo: true },
+    });
+
+    if (!userModulo) {
+      console.log("Módulo ativo não encontrado");
+      return res.status(404).json({ error: "Módulo ativo não encontrado" });
+    }
+
+    await userModulo.update({ nota: score });
     console.log("Estou aqui");
 
     // Enviando a nota
@@ -100,7 +118,7 @@ router.post("/gradeIn", async (req, res) => {
       const responseGrade = await lti.Grade.submitScore(idtoken, lineItemId, gradeObj);
       console.log("Score enviado com sucesso: ", responseGrade);
 
-      return res.send("Nota enviada com sucesso");
+      return res.json("Nota enviada com sucesso");
     } catch (error) {
       console.error("Erro ao enviar a nota: ", error.message);
       return res.status(500).json({ error: "Erro ao enviar a nota",error });
