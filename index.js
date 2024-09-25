@@ -74,7 +74,7 @@ lti.onConnect(async (token, req, res) => {
 
       if(token.platformContext.launchPresentation.document_target == 'frame'){
         console.log("Indo pro app")
-        res.redirect(`https://admintecnocomp.uea.edu.br`);
+        // res.redirect(`https://admintecnocomp.uea.edu.br`); -> Funcionou mas crachou
       }else{
         console.log("Indo pra web")
       }
