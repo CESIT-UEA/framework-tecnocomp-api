@@ -118,7 +118,7 @@ router.post("/gradeIn", async (req, res) => {
       const responseGrade = await lti.Grade.submitScore(idtoken, lineItemId, gradeObj);
       console.log("Score enviado com sucesso: ", responseGrade);
 
-      return res.json("Nota enviada com sucesso");
+      return res.json(responseGrade);
     } catch (error) {
       console.error("Erro ao enviar a nota: ", error.message);
       return res.status(500).json({ error: "Erro ao enviar a nota",error });
