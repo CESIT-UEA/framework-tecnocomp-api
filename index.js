@@ -71,6 +71,13 @@ lti.onConnect(async (token, req, res) => {
         await createUser(token, ltik, modulo);
       }
       console.log("Passei por aqui")
+
+      if(token.platformContext.launchPresentation.document_target == 'frame'){
+        console.log("Indo pro app")
+      }else{
+        console.log("Indo pra web")
+      }
+
       console.log(`${urlFront}/modulo/${nomeModulo}?ltik=${ltik}`)
       res.redirect(`${urlFront}/modulo/${nomeModulo}?ltik=${ltik}`);
     } else {
