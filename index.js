@@ -26,10 +26,10 @@ const db = new LtiSequelize("tecnocomp", "tecnocomp", "0a463635baa5a", {
 });
 
 // Configurações do SSL
-const sslOptions = {
+/* const sslOptions = {
   key: fs.readFileSync('/certs/uea.edu.br.key'),
   cert: fs.readFileSync('/certs/uea.edu.br.fullchain.crt')
-};
+}; */
 
 // Configuração do LTI
 lti.setup(
@@ -40,7 +40,8 @@ lti.setup(
     devMode: true, // Certifique-se de que o devMode está desabilitado para usar SSL
   }
 );
-urlFront = "https://frametecnocomp.uea.edu.br"
+/* urlFront = "https://frametecnocomp.uea.edu.br" */
+urlFront = "http://localhost:4200"
 // CORS para permitir requisições do frontend
 lti.app.use(
   cors({
@@ -56,8 +57,8 @@ const { options } = require("./routes");
 // Handler de conexão LTI
 lti.onConnect(async (token, req, res) => {
   try {
-    console.log("Token abaixo")
-    console.log(token)
+    console.log("Corpo completo da requisição")
+    console.log(req)
     const ltik = req.query.ltik;
     let nomeModulo = token.platformContext.resource.title.toLowerCase().replace(/ /g, "-");
 
@@ -155,9 +156,9 @@ const plataforma = async () => {
 };
 
 // Criação do servidor HTTPS usando as opções SSL configuradas
-https.createServer(sslOptions, lti.app).listen(8002, () => {
+/* https.createServer(sslOptions, lti.app).listen(8002, () => {
   console.log('Servidor HTTPS rodando na porta 8002');
-});
+}); */
 
 // Função de setup
 const setup = async () => {

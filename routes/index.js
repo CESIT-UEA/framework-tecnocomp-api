@@ -109,16 +109,15 @@ router.post("/gradeIn", async (req, res) => {
       console.log("Módulo ativo não encontrado");
       return res.status(404).json({ error: "Módulo ativo não encontrado" });
     }
-
-    await userModulo.update({ nota: score });
-    console.log("Estou aqui");
-
     // Enviando a nota
     try {
       const responseGrade = await lti.Grade.submitScore(idtoken, lineItemId, gradeObj);
       console.log("Score enviado com sucesso: ", responseGrade);
-
-      return res.json(responseGrade);
+      if (responseGrade) {
+        const atualizandoNota = await userModulo.update({ nota: score });
+        console.log("Nota enviada primeiro para o moodle e depois atualizado no nosso banco")
+        return res.json(responseGrade)
+      }
     } catch (error) {
       console.error("Erro ao enviar a nota: ", error.message);
       return res.status(500).json({ error: "Erro ao enviar a nota",error });
