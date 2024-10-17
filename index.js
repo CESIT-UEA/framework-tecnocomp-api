@@ -40,8 +40,8 @@ lti.setup(
     devMode: true, // Certifique-se de que o devMode está desabilitado para usar SSL
   }
 );
-/* urlFront = "https://frametecnocomp.uea.edu.br" */
-urlFront = "http://localhost:4200"
+urlFront = "https://frametecnocomp.uea.edu.br"
+/* urlFront = "http://localhost:4200" */
 // CORS para permitir requisições do frontend
 lti.app.use(
   cors({
@@ -74,7 +74,7 @@ lti.onConnect(async (token, req, res) => {
 
       if(token.platformContext.launchPresentation.document_target == 'frame'){
         console.log("Indo pro app")
-        // res.redirect(`https://admintecnocomp.uea.edu.br`); -> Funcionou mas crachou
+         res.redirect(`myapp://login`);
       }else{
         console.log("Indo pra web")
       }
