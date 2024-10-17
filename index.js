@@ -1,6 +1,6 @@
 const express = require("express");
-const fs = require('fs');
-const https = require('https');
+const fs = require("fs");
+const https = require("https");
 const path = require("path");
 const { Sequelize, Op } = require("sequelize");
 const LtiSequelize = require("ltijs-sequelize");
@@ -12,23 +12,23 @@ app.use(express.json());
 
 // Configurações do banco de dados
 const sequelize = new Sequelize("tecnocomp", "tecnocomp", "0a463635baa5a", {
-  host: '172.25.1.5',
-  dialect: 'mysql', 
+  host: "172.25.1.5",
+  dialect: "mysql",
   port: 3306,
   logging: false,
 });
 
 const db = new LtiSequelize("tecnocomp", "tecnocomp", "0a463635baa5a", {
-  host: '172.25.1.5',
-  dialect: 'mysql', 
+  host: "172.25.1.5",
+  dialect: "mysql",
   port: 3306,
   logging: false,
 });
 
 // Configurações do SSL
 const sslOptions = {
-  key: fs.readFileSync('/certs/uea.edu.br.key'),
-  cert: fs.readFileSync('/certs/uea.edu.br.fullchain.crt')
+  key: fs.readFileSync("/certs/uea.edu.br.key"),
+  cert: fs.readFileSync("/certs/uea.edu.br.fullchain.crt"),
 };
 
 // Configuração do LTI
@@ -36,11 +36,11 @@ lti.setup(
   "LTIKEY", // Chave de LTI, use uma string forte
   { plugin: db }, // Plugin do Sequelize configurado anteriormente
   {
-    cookies: { secure: false, sameSite: ''},
+    cookies: { secure: false, sameSite: "" },
     devMode: true, // Certifique-se de que o devMode está desabilitado para usar SSL
   }
 );
-urlFront = "https://frametecnocomp.uea.edu.br"
+urlFront = "https://frametecnocomp.uea.edu.br";
 /* urlFront = "http://localhost:4200" */
 // CORS para permitir requisições do frontend
 lti.app.use(
@@ -51,15 +51,24 @@ lti.app.use(
 );
 
 // Importação dos modelos do Sequelize
-const { Modulo, UsuarioModulo, Topico, UsuarioTopico, PlataformaRegistro, Aluno } = require("./models");
+const {
+  Modulo,
+  UsuarioModulo,
+  Topico,
+  UsuarioTopico,
+  PlataformaRegistro,
+  Aluno,
+} = require("./models");
 const { options } = require("./routes");
 
 // Handler de conexão LTI
 lti.onConnect(async (token, req, res) => {
   try {
-    console.log(token)
+    console.log(token);
     const ltik = req.query.ltik;
-    let nomeModulo = token.platformContext.resource.title.toLowerCase().replace(/ /g, "-");
+    let nomeModulo = token.platformContext.resource.title
+      .toLowerCase()
+      .replace(/ /g, "-");
 
     const modulo = await Modulo.findOne({ where: { nome_modulo: nomeModulo } });
 
@@ -70,17 +79,16 @@ lti.onConnect(async (token, req, res) => {
       } else {
         await createUser(token, ltik, modulo);
       }
-      console.log("Passei por aqui")
+      console.log("Passei por aqui");
 
-      if(token.platformContext.launchPresentation.document_target == 'frame'){
-        console.log("Indo pro app")
-         res.redirect(`myapp://login`);
-      }else{
-        console.log("Indo pra web")
+      if (token.platformContext.launchPresentation.document_target == "frame") {
+        console.log("Indo pro app");
+        res.redirect(`myapp://login`);
+      } else {
+        console.log("Indo pra web");
+        console.log(`${urlFront}/modulo/${nomeModulo}?ltik=${ltik}`);
+        res.redirect(`${urlFront}/modulo/${nomeModulo}?ltik=${ltik}`);
       }
-
-      console.log(`${urlFront}/modulo/${nomeModulo}?ltik=${ltik}`)
-      res.redirect(`${urlFront}/modulo/${nomeModulo}?ltik=${ltik}`);
     } else {
       res.redirect(`${urlFront}/error404`);
       console.log("Modulo não existe");
@@ -134,7 +142,10 @@ async function updateUser(user, ltik, modulo, token) {
     });
 
     if (!userTopico) {
-      await UsuarioTopico.create({ ltiUserId: token.user, id_topico: topico.id });
+      await UsuarioTopico.create({
+        ltiUserId: token.user,
+        id_topico: topico.id,
+      });
     }
   }
 }
@@ -156,13 +167,13 @@ const plataforma = async () => {
 
 // Criação do servidor HTTPS usando as opções SSL configuradas
 https.createServer(sslOptions, lti.app).listen(8002, () => {
-  console.log('Servidor HTTPS rodando na porta 8002');
+  console.log("Servidor HTTPS rodando na porta 8002");
 });
 
 // Função de setup
 const setup = async () => {
   try {
-    await lti.deploy({port:3000}); // O deploy é necessário para inicializar o LTI, mas a porta será gerida pelo HTTPS criado manualmente
+    await lti.deploy({ port: 3000 }); // O deploy é necessário para inicializar o LTI, mas a porta será gerida pelo HTTPS criado manualmente
 
     // Registro das plataformas
     const registerPlataforma = await plataforma();
