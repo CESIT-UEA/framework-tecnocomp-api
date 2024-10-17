@@ -83,7 +83,8 @@ lti.onConnect(async (token, req, res) => {
 
       if (token.platformContext.launchPresentation.document_target == "frame") {
         console.log("Indo pro app");
-        res.redirect(`myapp://login`);
+        const deepLink = "myapp://login";
+        res.send(`<script>window.location.href = '${deepLink}';</script>`);
       } else {
         console.log("Indo pra web");
         console.log(`${urlFront}/modulo/${nomeModulo}?ltik=${ltik}`);
