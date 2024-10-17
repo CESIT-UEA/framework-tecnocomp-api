@@ -40,8 +40,8 @@ lti.setup(
     devMode: true, // Certifique-se de que o devMode está desabilitado para usar SSL
   }
 );
-urlFront = "https://frametecnocomp.uea.edu.br"
-/* urlFront = "http://localhost:4200" */
+/* urlFront = "https://frametecnocomp.uea.edu.br" */
+urlFront = "http://localhost:4200"
 // CORS para permitir requisições do frontend
 lti.app.use(
   cors({
@@ -57,8 +57,7 @@ const { options } = require("./routes");
 // Handler de conexão LTI
 lti.onConnect(async (token, req, res) => {
   try {
-    console.log("Corpo completo da requisição")
-    console.log(req)
+    console.log(token)
     const ltik = req.query.ltik;
     let nomeModulo = token.platformContext.resource.title.toLowerCase().replace(/ /g, "-");
 
