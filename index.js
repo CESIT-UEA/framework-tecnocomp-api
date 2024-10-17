@@ -87,10 +87,10 @@ lti.onConnect(async (token, req, res) => {
         res.send(`<script>window.location.href = '${deepLink}';</script>`);
       } else {
         console.log("Indo pra web");
-/*         console.log(`${urlFront}/modulo/${nomeModulo}?ltik=${ltik}`);
-        res.redirect(`${urlFront}/modulo/${nomeModulo}?ltik=${ltik}`); */
-        const deepLink = "myapp://login";
-        res.send(`<script>window.location.href = '${deepLink}';</script>`);
+        console.log(`${urlFront}/modulo/${nomeModulo}?ltik=${ltik}`);
+        res.redirect(`${urlFront}/modulo/${nomeModulo}?ltik=${ltik}`);
+/*         const deepLink = "myapp://login";
+        res.send(`<script>window.location.href = '${deepLink}';</script>`); */
       }
     } else {
       res.redirect(`${urlFront}/error404`);
