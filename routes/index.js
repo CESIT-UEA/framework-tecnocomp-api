@@ -3,18 +3,8 @@ const router = express.Router();
 const gradeService = require("../Services/gradeService");
 const userService = require("../Services/userService");
 const videosService = require("../Services/videosService");
-const {
-  UsuarioModulo,
-  Modulo,
-  Topico,
-  UsuarioTopico,
-  VideoUrls,
-  SaibaMais,
-  Referencias,
-  Exercicios,
-  Alternativas,
-  Aluno,
-} = require("../models");
+const { UsuarioVideo } = require("../models");
+
 
 //Fazer a rota de grade enviando a atividade como incompleta
 router.post("/gradeIn", async (req, res) => {
@@ -89,6 +79,26 @@ router.get("/userInfo", async (req, res) => {
   } catch (err) {
     console.error("Erro ao obter informações do usuário:", err);
     return res.status(500).json({ error: "Erro interno do servidor" });
+  }
+});
+
+router.post("/finalizar-video", async (req, res) => {
+  const { ltiUserId, videoId, ltik } = req.body;
+  console.log(req.body)
+  try {
+    // Atualizar a entrada na tabela UsuarioVideo, marcando como completo
+    await UsuarioVideo.update(
+      { completo: true },
+      { where: { ltiUserId: ltiUserId, id_video: videoId } }
+    );
+
+    // Retorna os dados do usuário atualizados
+    const dados_user_atualizado = await userService.getDadosUser(ltik);
+
+    return res.status(200).json(dados_user_atualizado);
+  } catch (error) {
+    console.error("Erro ao finalizar vídeo:", error);
+    return res.status(500).json({ message: "Erro ao finalizar vídeo" });
   }
 });
 

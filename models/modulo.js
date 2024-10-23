@@ -7,8 +7,11 @@ module.exports = (sequelize, DataTypes) => {
         primaryKey: true,
         autoIncrement: true,
       },
+      nome_url: {
+        type: DataTypes.TEXT,
+      },
       nome_modulo: {
-        type: DataTypes.STRING,
+        type: DataTypes.TEXT,
         allowNull: false,
       },
       video_inicial: {
