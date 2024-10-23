@@ -30,8 +30,7 @@ const sslOptions = {
   key: fs.readFileSync("/certs/uea.edu.br.key"),
   cert: fs.readFileSync("/certs/uea.edu.br.fullchain.crt"),
 };
-console.log("Stack")
-console.log(stack.env)
+console.log(process.env)
 console.log(process.env.DB_NAME)
 // Configuração do LTI
 lti.setup(
