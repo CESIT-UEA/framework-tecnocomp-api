@@ -65,11 +65,15 @@ const { options } = require("./routes");
 // Handler de conexão LTI
 lti.onConnect(async (token, req, res) => {
   try {
-    console.log(req)
-    console.log(token)
+
     const userAgent = req.headers['user-agent'];
     const referer = req.headers.referer;
     const customOrigin = req.headers['x-lms-origin'];
+    console.log(userAgent)
+    console.log(referer)
+    console.log(customOrigin)
+    console.log(req)
+    console.log(token)
     const ltik = req.query.ltik;
     let nomeModulo = token.platformContext.resource.title
 
