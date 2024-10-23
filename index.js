@@ -25,10 +25,10 @@ const db = new LtiSequelize(process.env.DB_NAME, process.env.DB_USER, process.en
 });
 
 // Configurações do SSL
-/* const sslOptions = {
+const sslOptions = {
   key: fs.readFileSync("/certs/uea.edu.br.key"),
   cert: fs.readFileSync("/certs/uea.edu.br.fullchain.crt"),
-}; */
+};
 
 // Configuração do LTI
 lti.setup(
@@ -185,9 +185,9 @@ const plataforma = async () => {
 };
 
 // Criação do servidor HTTPS usando as opções SSL configuradas
-/* https.createServer(sslOptions, lti.app).listen(8002, () => {
+https.createServer(sslOptions, lti.app).listen(8002, () => {
   console.log("Servidor HTTPS rodando na porta 8002");
-}); */
+});
 
 // Função de setup
 const setup = async () => {
