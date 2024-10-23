@@ -65,15 +65,6 @@ const { options } = require("./routes");
 // Handler de conexão LTI
 lti.onConnect(async (token, req, res) => {
   try {
-
-    const userAgent = req.headers['user-agent'];
-    const referer = req.headers.referer;
-    const customOrigin = req.headers['x-lms-origin'];
-    console.log(userAgent)
-    console.log(referer)
-    console.log(customOrigin)
-    console.log(req)
-    console.log(token)
     const ltik = req.query.ltik;
     let nomeModulo = token.platformContext.resource.title
 
@@ -96,10 +87,7 @@ lti.onConnect(async (token, req, res) => {
       } else {
         console.log("Indo pra web");
         console.log(`${urlFront}/modulo/${modulo.nome_url}?ltik=${ltik}`);
-        res.redirect('https://myapp')
-/*         res.redirect(`${urlFront}/modulo/${modulo.nome_url}?ltik=${ltik}`); */
-/*         const deepLink = "myapp://login";
-        res.send(`<script>window.location.href = '${deepLink}';</script>`); */
+        res.redirect(`${urlFront}/modulo/${modulo.nome_url}?ltik=${ltik}`);
       }
     } else {
       res.redirect(`${urlFront}/error404`);
