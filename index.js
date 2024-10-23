@@ -30,8 +30,6 @@ const sslOptions = {
   key: fs.readFileSync("/certs/uea.edu.br.key"),
   cert: fs.readFileSync("/certs/uea.edu.br.fullchain.crt"),
 };
-console.log(process.env)
-console.log(process.env.DB_NAME)
 // Configuração do LTI
 lti.setup(
   process.env.LTI_KEY, // Chave de LTI, use uma string forte
@@ -84,12 +82,14 @@ lti.onConnect(async (token, req, res) => {
 
       if (token.platformContext.launchPresentation.document_target == "frame") {
         console.log("Indo pro app");
-        const deepLink = "myapp://login";
-        res.send(`<script>window.location.href = '${deepLink}';</script>`);
+/*         const deepLink = "myapp://login";
+        res.send(`<script>window.location.href = '${deepLink}';</script>`); */
+        res.redirect('https://myapp')
       } else {
         console.log("Indo pra web");
         console.log(`${urlFront}/modulo/${modulo.nome_url}?ltik=${ltik}`);
-        res.redirect(`${urlFront}/modulo/${modulo.nome_url}?ltik=${ltik}`);
+        res.redirect('https://myapp')
+/*         res.redirect(`${urlFront}/modulo/${modulo.nome_url}?ltik=${ltik}`); */
 /*         const deepLink = "myapp://login";
         res.send(`<script>window.location.href = '${deepLink}';</script>`); */
       }
