@@ -67,6 +67,9 @@ lti.onConnect(async (token, req, res) => {
   try {
     console.log(req)
     console.log(token)
+    const userAgent = req.headers['user-agent'];
+    const referer = req.headers.referer;
+    const customOrigin = req.headers['x-lms-origin'];
     const ltik = req.query.ltik;
     let nomeModulo = token.platformContext.resource.title
 
