@@ -27,6 +27,8 @@ const db = new LtiSequelize(process.env.DB_NAME, process.env.DB_USER, process.en
 
 let sslOptions;
 console.log(process.env.PRODUCAO)
+console.log(typeof(process.env.PRODUCAO))
+
 if (!process.env.PRODUCAO) {
   sslOptions = {
     key: fs.readFileSync("/certs/uea.edu.br.key"),
