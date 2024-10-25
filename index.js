@@ -30,7 +30,7 @@ console.log(process.env);
 console.log(process.env.PRODUCAO_VARIAVEL)
 console.log(typeof(process.env.PRODUCAO_VARIAVEL))
 
-if (!process.env.PRODUCAO_VARIAVEL) {
+if (process.env.PRODUCAO_VARIAVEL == 'true') {
   console.log("Entrei certificados");
   
   sslOptions = {
@@ -190,7 +190,7 @@ const plataforma = async () => {
   }
 };
 
-if(!process.env.PRODUCAO_VARIAVEL){
+if(process.env.PRODUCAO_VARIAVEL == 'true'){
   console.log("Entrei aqui")
   https.createServer(sslOptions, lti.app).listen(8002, () => {
     console.log("Servidor HTTPS rodando na porta 8002");
