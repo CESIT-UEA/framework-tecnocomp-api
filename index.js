@@ -26,9 +26,9 @@ const db = new LtiSequelize(process.env.DB_NAME, process.env.DB_USER, process.en
 });
 
 let sslOptions;
-
+console.log(process.env.PRODUCAO)
 if (!process.env.PRODUCAO) {
-  return sslOptions = {
+  sslOptions = {
     key: fs.readFileSync("/certs/uea.edu.br.key"),
     cert: fs.readFileSync("/certs/uea.edu.br.fullchain.crt"),
   };
