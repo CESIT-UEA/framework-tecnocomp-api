@@ -27,7 +27,7 @@ const db = new LtiSequelize(process.env.DB_NAME, process.env.DB_USER, process.en
 
 let sslOptions;
 
-if (process.env.PRODUCAO == true) {
+if (!process.env.PRODUCAO) {
   return sslOptions = {
     key: fs.readFileSync("/certs/uea.edu.br.key"),
     cert: fs.readFileSync("/certs/uea.edu.br.fullchain.crt"),
@@ -186,9 +186,12 @@ const plataforma = async () => {
 };
 
 if(!process.env.PRODUCAO){
+  console.log("Entrei aqui")
   https.createServer(sslOptions, lti.app).listen(8002, () => {
     console.log("Servidor HTTPS rodando na porta 8002");
   });
+}else{
+  console.log("Não entrei")
 }
 // Função de setup
 const setup = async () => {
