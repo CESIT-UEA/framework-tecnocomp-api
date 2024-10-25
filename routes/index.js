@@ -74,6 +74,9 @@ router.get("/userInfo", async (req, res) => {
   try {
     const ltik = res.locals.ltik;
     let dados_user = await userService.getDadosUser(ltik);
+    if (dados_user == null) {
+      return res.status(500).json("Erro ao puxar os dados do usuario")
+    }
 
     return res.status(200).json(dados_user);
   } catch (err) {
