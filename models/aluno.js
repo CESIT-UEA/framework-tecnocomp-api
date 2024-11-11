@@ -2,6 +2,11 @@ module.exports = (sequelize, DataTypes) => {
   const Aluno = sequelize.define(
     "Aluno",
     {
+      id_aluno: {
+      type: DataTypes.INTEGER,
+      primaryKey: true,
+      autoIncrement: true,
+    },
       ltiUserId: {
         type: DataTypes.STRING,
         primaryKey: true,
@@ -15,6 +20,9 @@ module.exports = (sequelize, DataTypes) => {
       ltik: {
         type: DataTypes.TEXT,
       },
+      id_plataforma: {
+        type: DataTypes.INTEGER
+      }
     },
     {
       tableName: "Alunos",

@@ -24,7 +24,7 @@ async function getDadosUser(ltik) {
 
     // Buscar o módulo ativo do usuário
     const userModulo = await UsuarioModulo.findOne({
-      where: { ltiUserId: user.ltiUserId, ativo: true },
+      where: { id_aluno: user.id_aluno, ativo: true },
     });
 
     if (!userModulo) {
@@ -46,7 +46,7 @@ async function getDadosUser(ltik) {
           include: [
             {
               model: UsuarioVideo,
-              where: { ltiUserId: user.ltiUserId },
+              where: { id_aluno: user.id_aluno},
               required: false,
             },
           ],
@@ -70,7 +70,7 @@ async function getDadosUser(ltik) {
               model: Aluno,
               required: true,
               where: {
-                ltiUserId: user.ltiUserId,
+                id_aluno: user.id_aluno,
               },
             },
           ],

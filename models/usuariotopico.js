@@ -5,8 +5,8 @@ module.exports = (sequelize, DataTypes) => {
         primaryKey: true,
         autoIncrement: true,
       },
-      ltiUserId: {
-        type: DataTypes.STRING,
+      id_aluno: {
+        type: DataTypes.INTEGER,
         allowNull: false,
       },
       id_topico: {
@@ -20,7 +20,10 @@ module.exports = (sequelize, DataTypes) => {
       encerrado: {
         type: DataTypes.BOOLEAN,
         defaultValue: false,
-      }
+      },
+      resposta_errada: {
+        type: DataTypes.TEXT,
+      },
     }, {
       tableName: 'UsuarioTopico',
       timestamps: false,

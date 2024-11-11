@@ -1,55 +1,59 @@
-require('dotenv').config();
-const fs = require('fs');
-const https = require('https');
+require("dotenv").config();
+const fs = require("fs");
+const https = require("https");
 const express = require("express");
-const { Sequelize, Op } = require("sequelize");
+const { Sequelize, Op, where } = require("sequelize");
 const LtiSequelize = require("ltijs-sequelize");
 const lti = require("ltijs").Provider;
 const cors = require("cors");
-
+const usuarioService = require("./Services/usuarioService");
 const app = express();
 app.use(express.json());
 
 // Configurações do banco de dados
-const sequelize = new Sequelize(process.env.DB_NAME, process.env.DB_USER, process.env.DB_PASS, {
-  host: process.env.DB_HOST,
-  dialect: "mysql",
-  port: 3306,
-  logging: false,
-});
+const sequelize = new Sequelize(
+  process.env.DB_NAME,
+  process.env.DB_USER,
+  process.env.DB_PASS,
+  {
+    host: process.env.DB_HOST,
+    dialect: "mysql",
+    port: 3306,
+    logging: false,
+  }
+);
 
-const db = new LtiSequelize(process.env.DB_NAME, process.env.DB_USER, process.env.DB_PASS, {
-  host: process.env.DB_HOST,
-  dialect: "mysql",
-  port: 3306,
-  logging: false,
-});
+const db = new LtiSequelize(
+  process.env.DB_NAME,
+  process.env.DB_USER,
+  process.env.DB_PASS,
+  {
+    host: process.env.DB_HOST,
+    dialect: "mysql",
+    port: 3306,
+    logging: false,
+  }
+);
 
 let sslOptions;
-console.log(process.env);
-console.log(process.env.PRODUCAO_VARIAVEL)
-console.log(typeof(process.env.PRODUCAO_VARIAVEL))
 
-if (process.env.PRODUCAO_VARIAVEL == 'true') {
-  console.log("Entrei certificados");
-  
+if (process.env.PRODUCAO_VARIAVEL == "true") {
   sslOptions = {
     key: fs.readFileSync("/certs/uea.edu.br.key"),
     cert: fs.readFileSync("/certs/uea.edu.br.fullchain.crt"),
   };
 }
-// Configuração do LTI
+
 lti.setup(
-  process.env.LTI_KEY, // Chave de LTI, use uma string forte
-  { plugin: db }, // Plugin do Sequelize configurado anteriormente
+  process.env.LTI_KEY,
+  { plugin: db },
   {
     cookies: { secure: false, sameSite: "" },
-    devMode: true, // Certifique-se de que o devMode está desabilitado para usar SSL
+    devMode: true,
   }
 );
-urlFront =  process.env.CORS_ORIGIN
-/* urlFront = "http://localhost:4200" */
-// CORS para permitir requisições do frontend
+urlFront = process.env.CORS_ORIGIN;
+
 lti.app.use(
   cors({
     origin: urlFront,
@@ -57,46 +61,36 @@ lti.app.use(
   })
 );
 
-// Importação dos modelos do Sequelize
 const {
   Modulo,
-  UsuarioModulo,
-  Topico,
-  UsuarioTopico,
   PlataformaRegistro,
   Aluno,
-  VideoUrls,
-  UsuarioVideo,
 } = require("./models");
 const { options } = require("./routes");
 
-// Handler de conexão LTI
 lti.onConnect(async (token, req, res) => {
   try {
+    console.log(token);
     const ltik = req.query.ltik;
-    let nomeModulo = token.platformContext.resource.title
+    let nomeModulo = token.platformContext.resource.title;
+
+    const plataforma = await PlataformaRegistro.findOne({
+      where: { plataformaUrl: token.iss },
+    });
 
     const modulo = await Modulo.findOne({ where: { nome_modulo: nomeModulo } });
-
+    console.log(plataforma);
     if (modulo) {
-      const user = await Aluno.findOne({ where: { ltiUserId: token.user } });
+      const user = await Aluno.findOne({
+        where: { ltiUserId: token.user, id_plataforma: plataforma.id },
+      });
       if (user) {
-        await updateUser(user, ltik, modulo, token);
+        await usuarioService.updateUser(user, ltik, modulo, token);
       } else {
-        await createUser(token, ltik, modulo);
+        await usuarioService.createUser(token, ltik, modulo, plataforma);
       }
-      console.log("Passei por aqui");
-
-      if (token.platformContext.launchPresentation.document_target == "frame") {
-        console.log("Indo pro app");
-/*         const deepLink = "myapp://login";
-        res.send(`<script>window.location.href = '${deepLink}';</script>`); */
-        res.redirect('https://myapp')
-      } else {
-        console.log("Indo pra web");
-        console.log(`${urlFront}/modulo/${modulo.nome_url}?ltik=${ltik}`);
-        res.redirect(`${urlFront}/modulo/${modulo.nome_url}?ltik=${ltik}`);
-      }
+      console.log(`${urlFront}/modulo/${modulo.nome_url}?ltik=${ltik}`);
+      res.redirect(`${urlFront}/modulo/${modulo.nome_url}?ltik=${ltik}`);
     } else {
       res.redirect(`${urlFront}/error404`);
       console.log("Modulo não existe");
@@ -107,77 +101,7 @@ lti.onConnect(async (token, req, res) => {
   }
 });
 
-// Função para criar novo usuário
-async function createUser(token, ltik, modulo) {
-  const user = await Aluno.create({
-    ltiUserId: token.user,
-    nome: token.userInfo.name,
-    email: token.userInfo.email,
-    ltik: ltik,
-  });
-
-  await UsuarioModulo.create({ id_modulo: modulo.id, ltiUserId: token.user });
-
-  const topicos = await Topico.findAll({ where: { id_modulo: modulo.id } });
-  for (let topico of topicos) {
-    await UsuarioTopico.create({ ltiUserId: token.user, id_topico: topico.id });
-    
-    // Associar vídeos ao aluno
-    const videos = await VideoUrls.findAll({ where: { id_topico: topico.id } });
-    for (let video of videos) {
-      await UsuarioVideo.create({ ltiUserId: token.user, id_video: video.id });
-    }
-  }
-}
-
-
-// Função para atualizar usuário existente
-async function updateUser(user, ltik, modulo, token) {
-  await user.update({ ltik: ltik });
-
-  await UsuarioModulo.update(
-    { ativo: false },
-    { where: { ltiUserId: user.ltiUserId, id_modulo: { [Op.ne]: modulo.id } } }
-  );
-
-  const userModulo = await UsuarioModulo.findOne({
-    where: { id_modulo: modulo.id, ltiUserId: user.ltiUserId },
-  });
-
-  if (userModulo) {
-    await userModulo.update({ ativo: true });
-  } else {
-    await UsuarioModulo.create({ id_modulo: modulo.id, ltiUserId: token.user });
-  }
-
-  const topicos = await Topico.findAll({ where: { id_modulo: modulo.id } });
-  for (let topico of topicos) {
-    const userTopico = await UsuarioTopico.findOne({
-      where: { ltiUserId: token.user, id_topico: topico.id },
-    });
-
-    if (!userTopico) {
-      await UsuarioTopico.create({ ltiUserId: token.user, id_topico: topico.id });
-    }
-
-    // Associar vídeos ao aluno
-    const videos = await VideoUrls.findAll({ where: { id_topico: topico.id } });
-    for (let video of videos) {
-      const userVideo = await UsuarioVideo.findOne({
-        where: { ltiUserId: token.user, id_video: video.id },
-      });
-
-      if (!userVideo) {
-        await UsuarioVideo.create({ ltiUserId: token.user, id_video: video.id });
-      }
-    }
-  }
-}
-
-
-// Importação das rotas
 lti.app.use("/", require("./routes"));
-// Função para registrar plataformas
 const plataforma = async () => {
   try {
     const plataformas = await PlataformaRegistro.findAll({
@@ -190,13 +114,10 @@ const plataforma = async () => {
   }
 };
 
-if(process.env.PRODUCAO_VARIAVEL == 'true'){
-  console.log("Entrei aqui")
+if (process.env.PRODUCAO_VARIAVEL == "true") {
   https.createServer(sslOptions, lti.app).listen(8002, () => {
     console.log("Servidor HTTPS rodando na porta 8002");
   });
-}else{
-  console.log("Não entrei")
 }
 // Função de setup
 const setup = async () => {
@@ -230,5 +151,4 @@ const setup = async () => {
   }
 };
 
-// Chamada da função de setup
 setup();

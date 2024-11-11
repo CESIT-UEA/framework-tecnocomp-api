@@ -5,8 +5,8 @@ module.exports = (sequelize, DataTypes) => {
         primaryKey: true,
         autoIncrement: true,
       },
-      ltiUserId: {
-        type: DataTypes.STRING,
+      id_aluno: {
+        type: DataTypes.INTEGER,
         allowNull: false,
       },
       id_modulo: {

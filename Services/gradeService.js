@@ -13,7 +13,7 @@ const {
 const { where } = require("sequelize");
 const lti = require("ltijs").Provider;
 
-async function submitGrade(idtoken, score, ltik) {
+async function submitGrade(idtoken, score, ltik, activityProgress,gradingProgress) {
   // Verificar LineItem ID
   const lineItemId = idtoken?.platformContext?.endpoint?.lineitem;
   if (!lineItemId) {
@@ -28,7 +28,7 @@ async function submitGrade(idtoken, score, ltik) {
 
   // Verificar módulo ativo
   const userModulo = await UsuarioModulo.findOne({
-    where: { ltiUserId: user.ltiUserId, ativo: true },
+    where: { id_aluno: user.id_aluno, ativo: true },
   });
   if (!userModulo) {
     throw new Error("Módulo ativo não encontrado");
@@ -38,8 +38,8 @@ async function submitGrade(idtoken, score, ltik) {
     userId: idtoken.user,
     scoreGiven: score,
     scoreMaximum: 100,
-    activityProgress: 'Completed',
-    gradingProgress: 'FullyGraded'
+    activityProgress: activityProgress,
+    gradingProgress: gradingProgress
   };
 
   try {

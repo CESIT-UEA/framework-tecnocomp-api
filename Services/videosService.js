@@ -17,7 +17,7 @@ async function liberarProximoVideo(id_topico, ltik) {
   const user = await Aluno.findOne({ where: { ltik: ltik } });
   if (user) {
     const userTopico = await UsuarioTopico.findOne({
-      where: { ltiUserId: user.ltiUserId, id_topico: id_topico },
+      where: { id_aluno: user.id_aluno, id_topico: id_topico },
     });
     if (userTopico) {
       userTopico.update({ encerrado: 1 });

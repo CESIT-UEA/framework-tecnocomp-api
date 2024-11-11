@@ -51,20 +51,20 @@ db.Exercicios.hasMany(db.Alternativas, { foreignKey: 'id_exercicio' });
 db.Alternativas.belongsTo(db.Exercicios, { foreignKey: 'id_exercicio' });
 
 
-db.Aluno.hasMany(db.UsuarioModulo, { foreignKey: 'ltiUserId' });
-db.UsuarioModulo.belongsTo(db.Aluno, { foreignKey: 'ltiUserId' });
+db.Aluno.hasMany(db.UsuarioModulo, { foreignKey: 'id_aluno' });
+db.UsuarioModulo.belongsTo(db.Aluno, { foreignKey: 'id_aluno' });
 
 
-db.Aluno.hasMany(db.UsuarioTopico, { foreignKey: 'ltiUserId' });
-db.UsuarioTopico.belongsTo(db.Aluno, { foreignKey: 'ltiUserId' });
+db.Aluno.hasMany(db.UsuarioTopico, { foreignKey: 'id_aluno' });
+db.UsuarioTopico.belongsTo(db.Aluno, { foreignKey: 'id_aluno' });
 
 
 db.Topico.hasMany(db.UsuarioTopico, { foreignKey: 'id_topico' });
 db.UsuarioTopico.belongsTo(db.Topico, { foreignKey: 'id_topico' });
 
 
-db.Aluno.hasMany(db.UsuarioVideo, { foreignKey: 'ltiUserId' }); 
-db.UsuarioVideo.belongsTo(db.Aluno, { foreignKey: 'ltiUserId' });
+db.Aluno.hasMany(db.UsuarioVideo, { foreignKey: 'id_aluno' }); 
+db.UsuarioVideo.belongsTo(db.Aluno, { foreignKey: 'id_aluno' });
 
 db.VideoUrls.hasMany(db.UsuarioVideo, { foreignKey: 'id_video' }); 
 db.UsuarioVideo.belongsTo(db.VideoUrls, { foreignKey: 'id_video' });

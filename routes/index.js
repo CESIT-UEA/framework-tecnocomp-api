@@ -1,12 +1,16 @@
+const {
+  Aluno,
+  UsuarioVideo,
+  UsuarioTopico,
+} = require("../models");
 const express = require("express");
 const router = express.Router();
 const gradeService = require("../Services/gradeService");
 const userService = require("../Services/userService");
 const videosService = require("../Services/videosService");
-const { UsuarioVideo } = require("../models");
 
 
-//Fazer a rota de grade enviando a atividade como incompleta
+
 router.post("/gradeIn", async (req, res) => {
   try {
     const idtoken = res.locals.token; // IdToken
@@ -21,7 +25,8 @@ router.post("/gradeIn", async (req, res) => {
 
     const ltik = res.locals.ltik; // Pega o ltik do usuário
 
-    const responseGrade = await gradeService.submitGrade(idtoken, score, ltik);
+    const responseGrade = await gradeService.submitGrade(idtoken, score, ltik,'InProgress','Pending');
+    console.log(responseGrade)
     const dados_user_atualizado = await userService.getDadosUser(ltik);
 
     return res.status(200).json(dados_user_atualizado);
@@ -45,7 +50,7 @@ router.post("/grade", async (req, res) => {
 
     const ltik = res.locals.ltik; // Pega o ltik do usuário
 
-    const responseGrade = await gradeService.submitGrade(idtoken, score, ltik);
+    const responseGrade = await gradeService.submitGrade(idtoken, score, ltik,'Completed','FullyGraded');
     const dados_user_atualizado = await userService.getDadosUser(ltik);
 
     return res.status(200).json(dados_user_atualizado);
@@ -88,11 +93,13 @@ router.get("/userInfo", async (req, res) => {
 router.post("/finalizar-video", async (req, res) => {
   const { ltiUserId, videoId, ltik } = req.body;
   console.log(req.body)
+  const user = await Aluno.findOne({ where: { ltik } });
+
   try {
     // Atualizar a entrada na tabela UsuarioVideo, marcando como completo
     await UsuarioVideo.update(
       { completo: true },
-      { where: { ltiUserId: ltiUserId, id_video: videoId } }
+      { where: { id_aluno: user.id_aluno, id_video: videoId } }
     );
 
     // Retorna os dados do usuário atualizados
@@ -102,6 +109,46 @@ router.post("/finalizar-video", async (req, res) => {
   } catch (error) {
     console.error("Erro ao finalizar vídeo:", error);
     return res.status(500).json({ message: "Erro ao finalizar vídeo" });
+  }
+});
+
+router.post("/resposta-errada", async (req, res) => {
+  const {idTopico, ltik,respostaErrada } = req.body;
+  console.log(req.body)
+  const user = await Aluno.findOne({ where: { ltik } });
+
+  try {
+    await UsuarioTopico.update(
+      { resposta_errada: respostaErrada },
+      { where: { id_aluno: user.id_aluno, id_topico: idTopico } }
+    );
+
+    const dados_user_atualizado = await userService.getDadosUser(ltik);
+
+    return res.status(200).json(dados_user_atualizado);
+  } catch (error) {
+    console.error("Erro ao cadastrar resposta errada:", error);
+    return res.status(500).json({ message: "Erro ao cadastrar resposta errada" });
+  }
+});
+
+router.post("/resposta-errada-refazer", async (req, res) => {
+  const {idTopico, ltik } = req.body;
+  console.log(req.body)
+  const user = await Aluno.findOne({ where: { ltik } });
+
+  try {
+    await UsuarioTopico.update(
+      { resposta_errada: null },
+      { where: { id_aluno: user.id_aluno, id_topico: idTopico } }
+    );
+
+    const dados_user_atualizado = await userService.getDadosUser(ltik);
+
+    return res.status(200).json(dados_user_atualizado);
+  } catch (error) {
+    console.error("Erro ao resetar a resposta errada:", error);
+    return res.status(500).json({ message: "Erro ao resetar a resposta errada" });
   }
 });
 
