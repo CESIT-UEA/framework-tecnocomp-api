@@ -25,7 +25,7 @@ router.post("/gradeIn", async (req, res) => {
 
     const ltik = res.locals.ltik; // Pega o ltik do usuário
 
-    const responseGrade = await gradeService.submitGrade(idtoken, score, ltik,'InProgress','Pending');
+    const responseGrade = await gradeService.submitGrade(idtoken, score, ltik,'InProgress','FullyGraded');
     console.log(responseGrade)
     const dados_user_atualizado = await userService.getDadosUser(ltik);
 

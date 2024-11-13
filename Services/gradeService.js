@@ -1,19 +1,25 @@
 const {
-    UsuarioModulo,
-    Modulo,
-    Topico,
-    UsuarioTopico,
-    VideoUrls,
-    SaibaMais,
-    Referencias,
-    Exercicios,
-    Alternativas,
-    Aluno,
-  } = require("../models");
+  UsuarioModulo,
+  Modulo,
+  Topico,
+  UsuarioTopico,
+  VideoUrls,
+  SaibaMais,
+  Referencias,
+  Exercicios,
+  Alternativas,
+  Aluno,
+} = require("../models");
 const { where } = require("sequelize");
 const lti = require("ltijs").Provider;
 
-async function submitGrade(idtoken, score, ltik, activityProgress,gradingProgress) {
+async function submitGrade(
+  idtoken,
+  score,
+  ltik,
+  activityProgress,
+  gradingProgress
+) {
   // Verificar LineItem ID
   const lineItemId = idtoken?.platformContext?.endpoint?.lineitem;
   if (!lineItemId) {
@@ -39,16 +45,20 @@ async function submitGrade(idtoken, score, ltik, activityProgress,gradingProgres
     scoreGiven: score,
     scoreMaximum: 100,
     activityProgress: activityProgress,
-    gradingProgress: gradingProgress
+    gradingProgress: gradingProgress,
   };
 
   try {
     // Enviar a nota
-    const responseGrade = await lti.Grade.submitScore(idtoken, lineItemId, gradeObj);
-    
+    const responseGrade = await lti.Grade.submitScore(
+      idtoken,
+      lineItemId,
+      gradeObj
+    );
+    console.log(responseGrade);
     if (responseGrade) {
-        await userModulo.update({ nota: score });
-        return responseGrade;
+      await userModulo.update({ nota: score });
+      return responseGrade;
     }
   } catch (error) {
     throw new Error(`Erro ao enviar a nota: ${error.message}`);
