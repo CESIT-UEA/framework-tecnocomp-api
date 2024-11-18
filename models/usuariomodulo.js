@@ -25,7 +25,7 @@ module.exports = (sequelize, DataTypes) => {
         type: DataTypes.BOOLEAN,
         defaultValue: true,
       },
-      url_retorno : {
+      url_retorno: {
         type: DataTypes.TEXT,
       }
     }, {

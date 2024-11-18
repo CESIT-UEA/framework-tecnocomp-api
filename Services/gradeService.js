@@ -64,7 +64,7 @@ async function submitGrade(
     }
   } catch (error) {
     console.log(error)
-    throw new Error(`Erro ao enviar a nota: ${error.message}`);
+    throw new Error(`Erro ao enviar a nota: ${error}`);
   }
 }
 

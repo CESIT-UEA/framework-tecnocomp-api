@@ -60,6 +60,7 @@ async function updateUser(user, ltik, modulo, token) {
     await UsuarioModulo.create({
       id_modulo: modulo.id,
       id_aluno: user.id_aluno,
+      url_retorno: url_retorno
     });
   }
 
