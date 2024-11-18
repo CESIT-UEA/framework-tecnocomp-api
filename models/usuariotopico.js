@@ -24,6 +24,9 @@ module.exports = (sequelize, DataTypes) => {
       resposta_errada: {
         type: DataTypes.TEXT,
       },
+      indice_video:{
+        type: DataTypes.INTEGER
+      }
     }, {
       tableName: 'UsuarioTopico',
       timestamps: false,

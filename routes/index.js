@@ -8,11 +8,13 @@ const router = express.Router();
 const gradeService = require("../Services/gradeService");
 const userService = require("../Services/userService");
 const videosService = require("../Services/videosService");
+const { where } = require("sequelize");
 
 
 
-router.post("/gradeIn", async (req, res) => {
+router.post("/gradein", async (req, res) => {
   try {
+    console.log("Grade in")
     const idtoken = res.locals.token; // IdToken
     if (!idtoken) {
       return res.status(400).send({ error: "Token inválido" });
@@ -22,7 +24,7 @@ router.post("/gradeIn", async (req, res) => {
     if (typeof score !== "number" || score < 0) {
       return res.status(400).json({ error: "Nota inválida" });
     }
-
+    
     const ltik = res.locals.ltik; // Pega o ltik do usuário
 
     const responseGrade = await gradeService.submitGrade(idtoken, score, ltik,'InProgress','FullyGraded');
@@ -31,6 +33,7 @@ router.post("/gradeIn", async (req, res) => {
 
     return res.status(200).json(dados_user_atualizado);
   } catch (err) {
+    console.log(err)
     console.error("Erro no processo: ", err.message);
     return res.status(500).send({ error: err.message });
   }
@@ -38,6 +41,7 @@ router.post("/gradeIn", async (req, res) => {
 
 router.post("/grade", async (req, res) => {
   try {
+
     const idtoken = res.locals.token; // IdToken
     if (!idtoken) {
       return res.status(400).send({ error: "Token inválido" });
@@ -100,6 +104,27 @@ router.post("/finalizar-video", async (req, res) => {
     await UsuarioVideo.update(
       { completo: true },
       { where: { id_aluno: user.id_aluno, id_video: videoId } }
+    );
+
+    // Retorna os dados do usuário atualizados
+    const dados_user_atualizado = await userService.getDadosUser(ltik);
+
+    return res.status(200).json(dados_user_atualizado);
+  } catch (error) {
+    console.error("Erro ao finalizar vídeo:", error);
+    return res.status(500).json({ message: "Erro ao finalizar vídeo" });
+  }
+});
+
+router.post("/salvar-progresso-video", async (req, res) => {
+  const {id_video, ltik, id_topico } = req.body;
+  console.log(req.body)
+  const user = await Aluno.findOne({ where: { ltik } });
+
+  try {
+    await UsuarioTopico.update(
+      { indice_video: id_video },
+      { where: { id_aluno: user.id_aluno, id_topico: id_topico } }
     );
 
     // Retorna os dados do usuário atualizados

@@ -22,6 +22,7 @@ async function submitGrade(
 ) {
   // Verificar LineItem ID
   const lineItemId = idtoken?.platformContext?.endpoint?.lineitem;
+  console.log(lineItemId)
   if (!lineItemId) {
     throw new Error("LineItem ID não encontrado");
   }
@@ -47,7 +48,8 @@ async function submitGrade(
     activityProgress: activityProgress,
     gradingProgress: gradingProgress,
   };
-
+  console.log(gradeObj);
+  console.log(idtoken)
   try {
     // Enviar a nota
     const responseGrade = await lti.Grade.submitScore(
@@ -61,6 +63,7 @@ async function submitGrade(
       return responseGrade;
     }
   } catch (error) {
+    console.log(error)
     throw new Error(`Erro ao enviar a nota: ${error.message}`);
   }
 }

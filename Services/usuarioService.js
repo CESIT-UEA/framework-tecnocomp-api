@@ -11,12 +11,14 @@ const {
   const {Op} = require("sequelize");
 
 async function createUser(token, ltik, modulo, plataforma) {
+  const url_retorno = token.platformContext.launchPresentation.return_url
   const user = await Aluno.create({
     ltiUserId: token.user,
     nome: token.userInfo.name,
     email: token.userInfo.email,
     ltik: ltik,
     id_plataforma: plataforma.id,
+    url_retorno : url_retorno
   });
 
   await UsuarioModulo.create({ id_modulo: modulo.id, id_aluno: user.id_aluno });
@@ -41,6 +43,7 @@ async function createUser(token, ltik, modulo, plataforma) {
 
 async function updateUser(user, ltik, modulo, token) {
   await user.update({ ltik: ltik });
+  const url_retorno = token.platformContext.launchPresentation.return_url
 
   await UsuarioModulo.update(
     { ativo: false },
@@ -52,7 +55,7 @@ async function updateUser(user, ltik, modulo, token) {
   });
 
   if (userModulo) {
-    await userModulo.update({ ativo: true });
+    await userModulo.update({ ativo: true, url_retorno: url_retorno });
   } else {
     await UsuarioModulo.create({
       id_modulo: modulo.id,

@@ -24,6 +24,9 @@ module.exports = (sequelize, DataTypes) => {
       ativo: {
         type: DataTypes.BOOLEAN,
         defaultValue: true,
+      },
+      url_retorno : {
+        type: DataTypes.TEXT,
       }
     }, {
       tableName: 'UsuarioModulo',
