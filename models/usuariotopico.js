@@ -26,7 +26,19 @@ module.exports = (sequelize, DataTypes) => {
       },
       indice_video:{
         type: DataTypes.INTEGER
-      }
+      },
+      isTextoApoio: {
+        type: DataTypes.BOOLEAN,
+        defaultValue: false,
+      },
+      isSaibaMais: {
+        type: DataTypes.BOOLEAN,
+        defaultValue: false,
+      },
+      isReferencias: {
+        type: DataTypes.BOOLEAN,
+        defaultValue: false,
+      },
     }, {
       tableName: 'UsuarioTopico',
       timestamps: false,
