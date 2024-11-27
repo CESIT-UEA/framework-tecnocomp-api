@@ -14,6 +14,10 @@ module.exports = (sequelize, DataTypes) => {
         type: DataTypes.TEXT,
         allowNull: false,
       },
+      ebookUrlGeral: {
+        type: DataTypes.TEXT,
+        allowNull: false,
+      },
       video_inicial: {
         type: DataTypes.STRING,
       },
