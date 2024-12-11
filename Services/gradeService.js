@@ -23,10 +23,10 @@ async function submitGrade(
   // Verificar LineItem ID
   const lineItemId = idtoken?.platformContext?.endpoint?.lineitem;
   console.log(lineItemId)
+  console.log(idtoken?.platformContext?.endpoint?.scope)
   if (!lineItemId) {
     throw new Error("LineItem ID não encontrado");
   }
-
   // Verificar usuário no banco
   const user = await Aluno.findOne({ where: { ltik: ltik } });
   if (!user) {
@@ -43,8 +43,8 @@ async function submitGrade(
 
   const gradeObj = {
     userId: idtoken.user,
-    scoreGiven: score,
-    scoreMaximum: 100,
+    scoreGiven: score/100,
+    scoreMaximum: 1,
     activityProgress: activityProgress,
     gradingProgress: gradingProgress,
   };
