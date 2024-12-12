@@ -73,9 +73,8 @@ router.post("/api/liberar", async (req, res) => {
   console.log("Entrei no liberar");
   try {
     const id_topico = req.body.idTopico;
+    const ltik = req.body.token; // Pega o ltik do usuário
     const dados_user_atualizado = await userService.getDadosUser(ltik);
-
-    const ltik = res.locals.ltik; // Pega o ltik do usuário
     const liberar = await videosService.liberarProximoVideo(
       id_topico,
       req.body.token
@@ -232,11 +231,9 @@ router.post("/finalizaTextoApoio", async (req, res) => {
       "Erro ao marcar como visto o Texto de apoio do topico:",
       error
     );
-    return res
-      .status(500)
-      .json({
-        message: "Erro ao marcar como visto o Texto de apoio do topico",
-      });
+    return res.status(500).json({
+      message: "Erro ao marcar como visto o Texto de apoio do topico",
+    });
   }
 });
 
