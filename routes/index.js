@@ -1,8 +1,4 @@
-const {
-  Aluno,
-  UsuarioVideo,
-  UsuarioTopico,
-} = require("../models");
+const { Aluno, UsuarioVideo, UsuarioTopico } = require("../models");
 const express = require("express");
 const router = express.Router();
 const gradeService = require("../Services/gradeService");
@@ -10,11 +6,9 @@ const userService = require("../Services/userService");
 const videosService = require("../Services/videosService");
 const { where } = require("sequelize");
 
-
-
 router.post("/gradein", async (req, res) => {
   try {
-    console.log("Grade in")
+    console.log("Grade in");
     const idtoken = res.locals.token; // IdToken
     if (!idtoken) {
       return res.status(400).send({ error: "Token inválido" });
@@ -24,16 +18,22 @@ router.post("/gradein", async (req, res) => {
     if (typeof score !== "number" || score < 0) {
       return res.status(400).json({ error: "Nota inválida" });
     }
-    
+
     const ltik = res.locals.ltik; // Pega o ltik do usuário
 
-    const responseGrade = await gradeService.submitGrade(idtoken, score, ltik,'InProgress','FullyGraded');
-    console.log(responseGrade)
+    const responseGrade = await gradeService.submitGrade(
+      idtoken,
+      score,
+      ltik,
+      "InProgress",
+      "FullyGraded"
+    );
+    console.log(responseGrade);
     const dados_user_atualizado = await userService.getDadosUser(ltik);
 
     return res.status(200).json(dados_user_atualizado);
   } catch (err) {
-    console.log(err)
+    console.log(err);
     console.error("Erro no processo: ", err.message);
     return res.status(500).send({ error: err.message });
   }
@@ -41,7 +41,6 @@ router.post("/gradein", async (req, res) => {
 
 router.post("/grade", async (req, res) => {
   try {
-
     const idtoken = res.locals.token; // IdToken
     if (!idtoken) {
       return res.status(400).send({ error: "Token inválido" });
@@ -54,7 +53,13 @@ router.post("/grade", async (req, res) => {
 
     const ltik = res.locals.ltik; // Pega o ltik do usuário
 
-    const responseGrade = await gradeService.submitGrade(idtoken, score, ltik,'Completed','FullyGraded');
+    const responseGrade = await gradeService.submitGrade(
+      idtoken,
+      score,
+      ltik,
+      "Completed",
+      "FullyGraded"
+    );
     const dados_user_atualizado = await userService.getDadosUser(ltik);
 
     return res.status(200).json(dados_user_atualizado);
@@ -68,12 +73,17 @@ router.post("/api/liberar", async (req, res) => {
   console.log("Entrei no liberar");
   try {
     const id_topico = req.body.idTopico;
-    const liberar = await videosService.liberarProximoVideo(id_topico,req.body.token);
-    console.log(liberar)
-    if (liberar) {
-      res.status(200).json(liberar);
-    }
+    const dados_user_atualizado = await userService.getDadosUser(ltik);
 
+    const ltik = res.locals.ltik; // Pega o ltik do usuário
+    const liberar = await videosService.liberarProximoVideo(
+      id_topico,
+      req.body.token
+    );
+    console.log(liberar);
+    if (liberar) {
+      return res.status(200).json(dados_user_atualizado);
+    }
   } catch (error) {
     console.log("Erro: ", error);
   }
@@ -84,7 +94,7 @@ router.get("/userInfo", async (req, res) => {
     const ltik = res.locals.ltik;
     let dados_user = await userService.getDadosUser(ltik);
     if (dados_user == null) {
-      return res.status(500).json("Erro ao puxar os dados do usuario")
+      return res.status(500).json("Erro ao puxar os dados do usuario");
     }
 
     return res.status(200).json(dados_user);
@@ -96,7 +106,7 @@ router.get("/userInfo", async (req, res) => {
 
 router.post("/finalizar-video", async (req, res) => {
   const { ltiUserId, videoId, ltik } = req.body;
-  console.log(req.body)
+  console.log(req.body);
   const user = await Aluno.findOne({ where: { ltik } });
 
   try {
@@ -117,8 +127,8 @@ router.post("/finalizar-video", async (req, res) => {
 });
 
 router.post("/salvar-progresso-video", async (req, res) => {
-  const {id_video, ltik, id_topico } = req.body;
-  console.log(req.body)
+  const { id_video, ltik, id_topico } = req.body;
+  console.log(req.body);
   const user = await Aluno.findOne({ where: { ltik } });
 
   try {
@@ -138,8 +148,8 @@ router.post("/salvar-progresso-video", async (req, res) => {
 });
 
 router.post("/resposta-errada", async (req, res) => {
-  const {idTopico, ltik,respostaErrada } = req.body;
-  console.log(req.body)
+  const { idTopico, ltik, respostaErrada } = req.body;
+  console.log(req.body);
   const user = await Aluno.findOne({ where: { ltik } });
 
   try {
@@ -153,13 +163,15 @@ router.post("/resposta-errada", async (req, res) => {
     return res.status(200).json(dados_user_atualizado);
   } catch (error) {
     console.error("Erro ao cadastrar resposta errada:", error);
-    return res.status(500).json({ message: "Erro ao cadastrar resposta errada" });
+    return res
+      .status(500)
+      .json({ message: "Erro ao cadastrar resposta errada" });
   }
 });
 
 router.post("/resposta-errada-refazer", async (req, res) => {
-  const {idTopico, ltik } = req.body;
-  console.log(req.body)
+  const { idTopico, ltik } = req.body;
+  console.log(req.body);
   const user = await Aluno.findOne({ where: { ltik } });
 
   try {
@@ -173,13 +185,15 @@ router.post("/resposta-errada-refazer", async (req, res) => {
     return res.status(200).json(dados_user_atualizado);
   } catch (error) {
     console.error("Erro ao resetar a resposta errada:", error);
-    return res.status(500).json({ message: "Erro ao resetar a resposta errada" });
+    return res
+      .status(500)
+      .json({ message: "Erro ao resetar a resposta errada" });
   }
 });
 
 router.post("/finalizaSaibaMais", async (req, res) => {
-  const {idTopico, ltik } = req.body;
-  console.log(req.body)
+  const { idTopico, ltik } = req.body;
+  console.log(req.body);
   const user = await Aluno.findOne({ where: { ltik } });
 
   try {
@@ -193,13 +207,15 @@ router.post("/finalizaSaibaMais", async (req, res) => {
     return res.status(200).json(dados_user_atualizado);
   } catch (error) {
     console.error("Erro ao marcar como visto o saiba mais do topico:", error);
-    return res.status(500).json({ message: "Erro ao marcar como visto o saiba mais do topico:" });
+    return res
+      .status(500)
+      .json({ message: "Erro ao marcar como visto o saiba mais do topico:" });
   }
 });
 
 router.post("/finalizaTextoApoio", async (req, res) => {
-  const {idTopico, ltik } = req.body;
-  console.log(req.body)
+  const { idTopico, ltik } = req.body;
+  console.log(req.body);
   const user = await Aluno.findOne({ where: { ltik } });
 
   try {
@@ -212,14 +228,21 @@ router.post("/finalizaTextoApoio", async (req, res) => {
 
     return res.status(200).json(dados_user_atualizado);
   } catch (error) {
-    console.error("Erro ao marcar como visto o Texto de apoio do topico:", error);
-    return res.status(500).json({ message: "Erro ao marcar como visto o Texto de apoio do topico" });
+    console.error(
+      "Erro ao marcar como visto o Texto de apoio do topico:",
+      error
+    );
+    return res
+      .status(500)
+      .json({
+        message: "Erro ao marcar como visto o Texto de apoio do topico",
+      });
   }
 });
 
 router.post("/finalizaReferencias", async (req, res) => {
-  const {idTopico, ltik } = req.body;
-  console.log(req.body)
+  const { idTopico, ltik } = req.body;
+  console.log(req.body);
   const user = await Aluno.findOne({ where: { ltik } });
 
   try {
@@ -233,7 +256,9 @@ router.post("/finalizaReferencias", async (req, res) => {
     return res.status(200).json(dados_user_atualizado);
   } catch (error) {
     console.error("Erro ao marcar como visto a Referencias do topico:", error);
-    return res.status(500).json({ message: "Erro ao marcar como visto a Referencias do topico" });
+    return res
+      .status(500)
+      .json({ message: "Erro ao marcar como visto a Referencias do topico" });
   }
 });
 
