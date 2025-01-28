@@ -75,7 +75,7 @@ lti.onConnect(async (token, req, res) => {
     let nomeModulo = token.platformContext.resource.title;
 
     const plataforma = await PlataformaRegistro.findOne({
-      where: { plataformaUrl: token.clientId },
+      where: { idCliente: token.clientId },
     });
 
     const modulo = await Modulo.findOne({ where: { nome_modulo: nomeModulo } });
