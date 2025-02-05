@@ -38,15 +38,15 @@ const db = new LtiSequelize(
 let sslOptions;
 
 if (process.env.PRODUCAO_VARIAVEL == "true") {
-  /*sslOptions = {
+  sslOptions = {
     key: fs.readFileSync("/certs/uea.edu.br.key"),
     cert: fs.readFileSync("/certs/uea.edu.br.fullchain.crt"),
-  };
-  */
-  sslOptions = {
+  }; 
+  
+  /* sslOptions = {
     key: fs.readFileSync("/certs/privkey.pem"),
     cert: fs.readFileSync("/certs/fullchain.pem"),
-  };
+  }; */
 }
 
 lti.setup(
