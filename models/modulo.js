@@ -4,13 +4,10 @@ module.exports = (sequelize, DataTypes) => {
     {
       id: {
         type: DataTypes.INTEGER,
-        primaryKey: true,
         autoIncrement: true,
+        primaryKey: true,
       },
       nome_url: {
-        type: DataTypes.TEXT,
-      },
-      nome_modulo: {
         type: DataTypes.TEXT,
         allowNull: false,
       },
@@ -18,8 +15,36 @@ module.exports = (sequelize, DataTypes) => {
         type: DataTypes.TEXT,
         allowNull: false,
       },
+      nome_modulo: {
+        type: DataTypes.TEXT,
+        allowNull: false,
+      },
       video_inicial: {
-        type: DataTypes.STRING,
+        type: DataTypes.TEXT,
+      },
+      nativo: {
+        type: DataTypes.BOOLEAN,
+        defaultValue: false,
+      },
+      publicado: {
+        type: DataTypes.BOOLEAN,
+        defaultValue: false,
+      },
+      template: {
+        type: DataTypes.BOOLEAN,
+        defaultValue: false,
+      },
+      usuario_id: {
+        type: DataTypes.INTEGER,
+        allowNull: false,
+        references: {
+          model: 'Usuarios',
+          key: 'id',
+        },
+      },
+      uuid: {
+        type: DataTypes.TEXT,
+        allowNull: false,
       },
     },
     {
