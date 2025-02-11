@@ -21,7 +21,7 @@ async function createUser(token, ltik, modulo, plataforma) {
     url_retorno : url_retorno
   });
 
-  await UsuarioModulo.create({ id_modulo: modulo.id, id_aluno: user.id_aluno });
+  await UsuarioModulo.create({ id_modulo: modulo.id, id_aluno: user.id_aluno,url_retorno: url_retorno });
 
   const topicos = await Topico.findAll({ where: { id_modulo: modulo.id } });
   for (let topico of topicos) {
