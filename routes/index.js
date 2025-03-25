@@ -1,4 +1,4 @@
-const { Aluno, UsuarioVideo, UsuarioTopico } = require("../models");
+const { Aluno, UsuarioVideo, UsuarioTopico,UsuarioModulo} = require("../models");
 const express = require("express");
 const router = express.Router();
 const gradeService = require("../Services/gradeService");
@@ -237,26 +237,35 @@ router.post("/finalizaTextoApoio", async (req, res) => {
   }
 });
 
-router.post("/finalizaReferencias", async (req, res) => {
-  const { idTopico, ltik } = req.body;
+//! Testar
+router.post("/enviar_avaliacao", async (req, res) => {
+  const { id_user_modulo, avaliacao, comentario, ltik } = req.body;
   console.log(req.body);
-  const user = await Aluno.findOne({ where: { ltik } });
+
+  const user = await UsuarioModulo.findOne({ where: { id : id_user_modulo } });
 
   try {
-    await UsuarioTopico.update(
-      { isReferencias: true },
-      { where: { id_aluno: user.id_aluno, id_topico: idTopico } }
-    );
+    if (user) {
+      await UsuarioModulo.update(
+        { avaliacao: avaliacao, comentario: comentario },
+        { where: { id : id_user_modulo } }
+      );
+  
+      const dados_user_atualizado = await userService.getDadosUser(ltik);
+  
+      return res.status(200).json(dados_user_atualizado);
+    }else{
+      return res.json({error:"Falha ao encontrar o UsuarioModulo Id"});
+    }
 
-    const dados_user_atualizado = await userService.getDadosUser(ltik);
-
-    return res.status(200).json(dados_user_atualizado);
   } catch (error) {
-    console.error("Erro ao marcar como visto a Referencias do topico:", error);
+    console.error("Erro ao tentar salvar a nota de avaliação do modulo:", error);
     return res
       .status(500)
-      .json({ message: "Erro ao marcar como visto a Referencias do topico" });
+      .json({ message: `Erro ao tentar salvar a nota de avaliação do modulo: ${error}`});
   }
 });
+
+
 
 module.exports = router;

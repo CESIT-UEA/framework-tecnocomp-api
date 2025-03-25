@@ -27,6 +27,12 @@ module.exports = (sequelize, DataTypes) => {
       },
       url_retorno: {
         type: DataTypes.TEXT,
+      },
+      avaliacao: {
+        type: DataTypes.INTEGER,
+      },
+      comentario: {
+        type: DataTypes.TEXT,
       }
     }, {
       tableName: 'UsuarioModulo',
