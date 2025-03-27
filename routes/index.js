@@ -237,6 +237,27 @@ router.post("/finalizaTextoApoio", async (req, res) => {
   }
 });
 
+router.post("/finalizaReferencias", async (req, res) => {
+  const { idTopico, ltik } = req.body;
+  console.log(req.body);
+  const user = await Aluno.findOne({ where: { ltik } });
+
+  try {
+    await UsuarioTopico.update(
+      { isReferencias: true },
+      { where: { id_aluno: user.id_aluno, id_topico: idTopico } }
+    );
+
+    const dados_user_atualizado = await userService.getDadosUser(ltik);
+
+    return res.status(200).json(dados_user_atualizado);
+  } catch (error) {
+    console.error("Erro ao marcar como visto a Referencias do topico:", error);
+    return res
+      .status(500)
+      .json({ message: "Erro ao marcar como visto a Referencias do topico" });
+  }
+});
 //! Testar
 router.post("/enviar_avaliacao", async (req, res) => {
   const { id_user_modulo, avaliacao, comentario, ltik } = req.body;
