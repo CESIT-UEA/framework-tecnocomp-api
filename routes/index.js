@@ -9,6 +9,7 @@ const { where } = require("sequelize");
 router.post("/gradein", async (req, res) => {
   try {
     console.log("Grade in");
+    console.log(req.body)
     const idtoken = res.locals.token; // IdToken
     if (!idtoken) {
       return res.status(400).send({ error: "Token inválido" });
