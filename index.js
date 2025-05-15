@@ -61,7 +61,7 @@ urlFront = process.env.CORS_ORIGIN;
 
 lti.app.use(
   cors({
-    origin: 'https://licomp.com.br',
+    origin: urlFront,
     credentials: true,
   })
 );
