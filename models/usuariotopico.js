@@ -39,6 +39,18 @@ module.exports = (sequelize, DataTypes) => {
         type: DataTypes.BOOLEAN,
         defaultValue: false,
       },
+      resposta_aberta_aluno: {
+        type: DataTypes.TEXT,
+      },
+      resposta_aberta_nota_IA: {
+        type: DataTypes.INTEGER,
+      },
+      resposta_aberta_justificativa_IA: {
+        type: DataTypes.TEXT,
+      },
+      resposta_aberta_teto: {
+        type: DataTypes.INTEGER,
+      }
     }, {
       tableName: 'UsuarioTopico',
       timestamps: false,

@@ -288,6 +288,54 @@ router.post("/enviar_avaliacao", async (req, res) => {
   }
 });
 
+router.post("/api/salvarAvaliacaoIA", async (req, res) => {
+  console.log("Entrei no salvarAvaliacaoIA");
+
+  try {
+    const {
+      idTopico,
+      token,
+      respostaAluno,
+      nota,
+      justificativa,
+      teto,
+    } = req.body;
+
+    const aluno = await Aluno.findOne({ where: { ltik: token } });
+
+    if (!aluno) {
+      return res.status(404).json({ message: "Aluno não encontrado" });
+    }
+
+    const userTopico = await UsuarioTopico.findOne({
+      where: {
+        id_aluno: aluno.id_aluno,
+        id_topico: idTopico,
+      },
+    });
+
+    if (!userTopico) {
+      return res
+        .status(404)
+        .json({ message: "Relação aluno-topico não encontrada" });
+    }
+
+    await userTopico.update({
+      resposta_aberta_aluno: respostaAluno,
+      resposta_aberta_nota_IA: nota,
+      resposta_aberta_justificativa_IA: justificativa,
+      resposta_aberta_teto: teto,
+      encerrado: 1,
+    });
+
+    // Atualiza e retorna o usuário com progresso atualizado
+    const dados_user_atualizado = await userService.getDadosUser(token);
+    return res.status(200).json(dados_user_atualizado);
+  } catch (error) {
+    console.log("Erro ao salvar avaliação IA: ", error);
+    res.status(500).json({ message: "Erro ao salvar avaliação da IA" });
+  }
+});
 
 
 module.exports = router;
