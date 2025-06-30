@@ -27,7 +27,32 @@ module.exports = (sequelize, DataTypes) => {
           key: "id",
         },
       },
-    },{
+      temaTipo: {
+        type: DataTypes.ENUM("padrao", "tema1", "tema2", "customizado"),
+        defaultValue: "padrao",
+      },
+      customPrimaria: {
+        type: DataTypes.STRING,
+        allowNull: true,
+      },
+      customSecundaria: {
+        type: DataTypes.STRING,
+        allowNull: true,
+      },
+      customTerciaria: {
+        type: DataTypes.STRING,
+        allowNull: true,
+      },
+      customQuartenaria: {
+        type: DataTypes.STRING,
+        allowNull: true,
+      },
+      customQuintenaria: {
+        type: DataTypes.STRING,
+        allowNull: true,
+      },
+    },
+    {
       tableName: "plataformaRegistro",
       timestamps: false,
     }

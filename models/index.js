@@ -23,9 +23,11 @@ db.UsuarioModulo = require('./usuariomodulo')(sequelize, Sequelize);
 db.UsuarioTopico = require('./usuariotopico')(sequelize, Sequelize);
 db.UsuarioVideo = require('./usuariovideo')(sequelize, Sequelize); 
 db.PlataformaRegistro = require('./plataformaRegistro')(sequelize, Sequelize);
-
-
-
+db.Vantagem = require('./vantagem')(sequelize, Sequelize);
+db.ReferenciaModulo = require('./ReferenciaModulo')(sequelize, Sequelize);
+db.FichaTecnica = require('./FichaTecnica')(sequelize, Sequelize);
+db.Equipe = require('./equipe')(sequelize, Sequelize);
+db.Membro = require('./membro')(sequelize, Sequelize);
 
 db.Modulo.hasMany(db.Topico, { foreignKey: 'id_modulo' });
 db.Topico.belongsTo(db.Modulo, { foreignKey: 'id_modulo' });
@@ -68,5 +70,77 @@ db.UsuarioVideo.belongsTo(db.Aluno, { foreignKey: 'id_aluno' });
 
 db.VideoUrls.hasMany(db.UsuarioVideo, { foreignKey: 'id_video' }); 
 db.UsuarioVideo.belongsTo(db.VideoUrls, { foreignKey: 'id_video' });
+
+// Modulo → Vantagens
+db.Modulo.hasMany(db.Vantagem, {
+  foreignKey: 'modulo_id',
+  onDelete: 'CASCADE',
+  onUpdate: 'CASCADE'
+});
+db.Vantagem.belongsTo(db.Modulo, {
+  foreignKey: 'modulo_id',
+  onDelete: 'CASCADE',
+  onUpdate: 'CASCADE'
+});
+
+// Modulo → Referencias_Modulo
+db.Modulo.hasMany(db.ReferenciaModulo, {
+  foreignKey: 'modulo_id',
+  onDelete: 'CASCADE',
+  onUpdate: 'CASCADE'
+});
+db.ReferenciaModulo.belongsTo(db.Modulo, {
+  foreignKey: 'modulo_id',
+  onDelete: 'CASCADE',
+  onUpdate: 'CASCADE'
+});
+
+// Modulo → UsuarioModulo
+db.Modulo.hasMany(db.UsuarioModulo, {
+  foreignKey: 'id_modulo',
+  onDelete: 'CASCADE',
+  onUpdate: 'CASCADE',
+});
+db.UsuarioModulo.belongsTo(db.Modulo, {
+  foreignKey: 'id_modulo',
+  onDelete: 'CASCADE',
+  onUpdate: 'CASCADE',
+});
+
+// Modulo → FichaTecnica
+db.Modulo.hasOne(db.FichaTecnica, {
+  foreignKey: "modulo_id",
+  onDelete: "CASCADE",
+  onUpdate: "CASCADE",
+});
+db.FichaTecnica.belongsTo(db.Modulo, {
+  foreignKey: "modulo_id",
+  onDelete: "CASCADE",
+  onUpdate: "CASCADE",
+});
+
+// FichaTecnica → Equipe
+db.FichaTecnica.hasMany(db.Equipe, {
+  foreignKey: "ficha_tecnica_id",
+  onDelete: "CASCADE",
+  onUpdate: "CASCADE",
+});
+db.Equipe.belongsTo(db.FichaTecnica, {
+  foreignKey: "ficha_tecnica_id",
+  onDelete: "CASCADE",
+  onUpdate: "CASCADE",
+});
+
+// Equipe → Membro
+db.Equipe.hasMany(db.Membro, {
+  foreignKey: "equipe_id",
+  onDelete: "CASCADE",
+  onUpdate: "CASCADE",
+});
+db.Membro.belongsTo(db.Equipe, {
+  foreignKey: "equipe_id",
+  onDelete: "CASCADE",
+  onUpdate: "CASCADE",
+});
 
 module.exports = db;

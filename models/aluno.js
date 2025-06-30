@@ -3,13 +3,12 @@ module.exports = (sequelize, DataTypes) => {
     "Aluno",
     {
       id_aluno: {
-      type: DataTypes.INTEGER,
-      primaryKey: true,
-      autoIncrement: true,
-    },
+        type: DataTypes.INTEGER,
+        primaryKey: true,
+        autoIncrement: true,
+      },
       ltiUserId: {
         type: DataTypes.STRING,
-        primaryKey: true,
       },
       nome: {
         type: DataTypes.STRING,
@@ -21,8 +20,8 @@ module.exports = (sequelize, DataTypes) => {
         type: DataTypes.TEXT,
       },
       id_plataforma: {
-        type: DataTypes.INTEGER
-      }
+        type: DataTypes.INTEGER,
+      },
     },
     {
       tableName: "Alunos",
