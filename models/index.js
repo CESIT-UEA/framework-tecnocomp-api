@@ -25,7 +25,7 @@ db.UsuarioVideo = require('./usuariovideo')(sequelize, Sequelize);
 db.PlataformaRegistro = require('./plataformaRegistro')(sequelize, Sequelize);
 db.Vantagem = require('./vantagem')(sequelize, Sequelize);
 db.ReferenciaModulo = require('./ReferenciaModulo')(sequelize, Sequelize);
-db.FichaTecnica = require('./FichaTecnica')(sequelize, Sequelize);
+db.FichaTecnica = require('./fichaTecnica')(sequelize, Sequelize);
 db.Equipe = require('./equipe')(sequelize, Sequelize);
 db.Membro = require('./membro')(sequelize, Sequelize);
 
